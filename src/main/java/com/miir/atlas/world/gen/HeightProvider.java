@@ -1,6 +1,9 @@
 package com.miir.atlas.world.gen;
 
 
+import com.miir.atlas.Atlas;
+import org.slf4j.Logger;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -11,80 +14,19 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+
 
 public class HeightProvider {
     private final int maxHeight;
-    //private final Map<PointI, Integer> points;
     private static final String CACHE_DIR = "./world/tiles/";
     private static final String TILE_URL = "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/";
-
+    private static final Logger LOGGER = Atlas.LOGGER;
     public HeightProvider(int maxHeight) {
         this.maxHeight = maxHeight;
-        //this.points = new ConcurrentHashMap<>(); // Use ConcurrentHashMap for thread safety
-        //ensureCacheDirectoryExists();
+
     }
 
 
-/*
-    public void loadPixelsInRange(int x, int z) {
-        int[][] heightArr = getHeightArray(x, z);
-        if (heightArr == null) {
-            System.err.println("Failed to load height array for coordinates (" + x + ", " + z + ")");
-            return;
-        }
-
-        for (int i = 0; i < heightArr.length; i++) {
-            for (int j = 0; j < heightArr[i].length; j++) {
-                PointI point = new PointI(x + i, z + j);
-                points.putIfAbsent(point, heightArr[i][j]); // Only add if not already present
-            }
-        }
-    }
-
-    private int[][] getHeightArray(int x, int z) {
-        BufferedImage image = getHeightmap(x, z, 15);
-        if (image == null) {
-            return null;
-        }
-
-        int width = image.getWidth();
-        int height = image.getHeight();
-        int[][] elevations = new int[height][width];
-        int maxElevation = Integer.MIN_VALUE;
-
-        try {
-            for (int yx = 0; yx < height; yx++) {
-                for (int xx = 0; xx < width; xx++) {
-                    int rgb = image.getRGB(xx, yx);
-                    int red = (rgb >> 16) & 0xFF;
-                    int green = (rgb >> 8) & 0xFF;
-                    int blue = rgb & 0xFF;
-
-                    double elevation = (red * 256 + green + blue / 256.0) - 32768;
-                    elevations[yx][xx] = (int) elevation;
-
-                    if (elevation > maxElevation) {
-                        maxElevation = (int) elevation;
-                    }
-                }
-            }
-
-            if (maxElevation > 0) {
-                for (int yx = 0; yx < height; yx++) {
-                    for (int xx = 0; xx < width; xx++) {
-                        elevations[yx][xx] = (elevations[yx][xx] * maxHeight) / maxElevation;
-                    }
-                }
-            }
-        } finally {
-            image.flush(); // Release resources held by the BufferedImage
-        }
-
-        return elevations;
-    }
-*/
 
     private int getElevationFromHeightmap(int x, int y, int zoom) {
         int xTile = x / 256;
@@ -105,7 +47,7 @@ public class HeightProvider {
                 return (int) ((elevation / 8840) * maxHeight) + 100;
 
             } catch (IOException e) {
-                System.err.println("Failed to load tile from cache: " + e.getMessage());
+                LOGGER.error("Failed to load tile from cache: {}", e.getMessage());
             }
         }
 
@@ -128,14 +70,12 @@ public class HeightProvider {
                 return (int) ((elevation / 8840) * maxHeight) + 100;
             }
         } catch (IOException e) {
-            System.err.println("Failed to download tile: " + e.getMessage());
+            LOGGER.error("Failed to download tile: {}", e.getMessage());
             return 64;
         }
     }
 
     public int getElevation(int x, int y) {
-        //System.out.println("Atlas");
         return getElevationFromHeightmap(x, y, 15);
-        // Return 0 if the point is still not in the map
     }
 }
