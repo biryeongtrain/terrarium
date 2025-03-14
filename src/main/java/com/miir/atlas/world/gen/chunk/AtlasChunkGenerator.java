@@ -56,9 +56,6 @@ public class AtlasChunkGenerator extends ChunkGenerator {
     private final float verticalScale;
     private final float horizontalScale;
 
-//    may revisit in the future, not a priority though
-//    private final ArrayList<CaveLayerEntry> caveLayers = new ArrayList<>();
-
 
     public AtlasChunkGenerator(
             String aquiferPath, String roofPath,
@@ -73,8 +70,6 @@ public class AtlasChunkGenerator extends ChunkGenerator {
         this.verticalScale = 1;
         this.horizontalScale = 1;
         this.heightmap = new HeightProvider(320);
-        //this.aquifer = !aquiferPath.isEmpty() ? Atlas.getOrCreateMap(aquiferPath, NamespacedMapImage.Type.GRAYSCALE) : null;
-        //this.roof = !roofPath.isEmpty() ? Atlas.getOrCreateMap(roofPath, NamespacedMapImage.Type.GRAYSCALE) : null;
         this.settings = settings;
     }
 
