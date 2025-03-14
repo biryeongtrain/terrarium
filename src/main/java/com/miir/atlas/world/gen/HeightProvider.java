@@ -133,8 +133,8 @@ public class HeightProvider {
         }
     }
 
-    public int lerp(int x, int y) {
-        System.out.println("Atlas");
+    public int getElevation(int x, int y) {
+        //System.out.println("Atlas");
         return getElevationFromHeightmap(x, y, 15);
         // Return 0 if the point is still not in the map
     }

@@ -96,7 +96,7 @@ public class AtlasChunkGenerator extends ChunkGenerator {
         float zR = (z / horizontalScale);
 
         if (xR < 0 || zR < 0) return this.getMinimumY() - 1;
-        double d = nmi.lerp(x,z);
+        double d = nmi.getElevation(x,z);
         return this.verticalScale * d + startingY;
     }
 
