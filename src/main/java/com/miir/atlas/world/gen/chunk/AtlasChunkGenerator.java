@@ -70,7 +70,6 @@ public class AtlasChunkGenerator extends ChunkGenerator {
             int ceilingHeight
     ) {
         super(biomeSource);
-
         this.seaLevel = settings.value().seaLevel();
         this.startingY = 64;
         this.ceilingHeight = ceilingHeight;
