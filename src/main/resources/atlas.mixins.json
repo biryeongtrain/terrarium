@@ -1,17 +1,10 @@
 {
-    "required": true,
+    "required": false,
     "minVersion": "0.8",
-    "package": "com.miir.atlas.mixin",
+    "package": "",
     "compatibilityLevel": "JAVA_21",
     "mixins": [
-        "CarverMixin",
-        "MaterialRuleContextAccessor",
-        "MaterialRuleContextMixin",
-        "MinecraftServerMixin",
-        "RegistryElementCodecAccessor",
-        "RegistryLoaderMixin",
-        "SurfaceBuilderMixin",
-        "ThreadedAnvilChunkStorageMixin"
+
     ],
     "injectors": {
         "defaultRequire": 1

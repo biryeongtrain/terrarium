@@ -2,9 +2,7 @@ package com.miir.atlas.world.gen.chunk;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.miir.atlas.Atlas;
-import com.miir.atlas.accessor.AMISurfaceBuilderAccessor;
-import com.miir.atlas.world.gen.AtlasMapInfo;
-import com.miir.atlas.world.gen.NamespacedMapImage;
+import com.miir.atlas.world.gen.HeightProvider;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -54,74 +52,61 @@ import java.util.stream.Stream;
 
 public class AtlasChunkGenerator extends ChunkGenerator {
     private static final BlockState AIR = Blocks.AIR.getDefaultState();
-    private final NamespacedMapImage heightmap;
-    private final NamespacedMapImage aquifer;
-    private final NamespacedMapImage roof;
+    private final HeightProvider heightmap;
     private final int seaLevel;
     private final int startingY;
     private final int ceilingHeight;
     private final RegistryEntry<ChunkGeneratorSettings> settings;
     private final float verticalScale;
     private final float horizontalScale;
-    private final RegistryEntry<AtlasMapInfo> mapInfo;
 
 //    may revisit in the future, not a priority though
 //    private final ArrayList<CaveLayerEntry> caveLayers = new ArrayList<>();
 
 
     public AtlasChunkGenerator(
-            RegistryEntry<AtlasMapInfo> ami, String aquiferPath, String roofPath,
+            String aquiferPath, String roofPath,
             BiomeSource biomeSource, RegistryEntry<ChunkGeneratorSettings> settings,
             int ceilingHeight
     ) {
         super(biomeSource);
-        this.mapInfo = ami;
+
         this.seaLevel = settings.value().seaLevel();
-        this.startingY = ami.value().startingY();
+        this.startingY = 64;
         this.ceilingHeight = ceilingHeight;
-        this.verticalScale = ami.value().verticalScale();
-        if (this.verticalScale != 1)
-            Atlas.LOGGER.warn("using non-default vertical scale for a dimension! this feature is in alpha, expect weird generation!");
-        this.horizontalScale = ami.value().horizontalScale();
-        this.heightmap = Atlas.getOrCreateMap(ami.value().heightmap(), NamespacedMapImage.Type.GRAYSCALE);
-        this.aquifer = !aquiferPath.isEmpty() ? Atlas.getOrCreateMap(aquiferPath, NamespacedMapImage.Type.GRAYSCALE) : null;
-        this.roof = !roofPath.isEmpty() ? Atlas.getOrCreateMap(roofPath, NamespacedMapImage.Type.GRAYSCALE) : null;
+        this.verticalScale = 1;
+        this.horizontalScale = 1;
+        this.heightmap = new HeightProvider(320);
+        //this.aquifer = !aquiferPath.isEmpty() ? Atlas.getOrCreateMap(aquiferPath, NamespacedMapImage.Type.GRAYSCALE) : null;
+        //this.roof = !roofPath.isEmpty() ? Atlas.getOrCreateMap(roofPath, NamespacedMapImage.Type.GRAYSCALE) : null;
         this.settings = settings;
     }
 
-    public void findMaps(MinecraftServer server, String levelName) throws IOException {
-        this.heightmap.initialize(server);
-        Atlas.LOGGER.info("found elevation data for dimension " + levelName + " in a " + this.heightmap.getWidth() + "x" + this.heightmap.getHeight() + " map: " + getPath());
-        if (!this.getAquiferPath().isEmpty()) {
-            this.aquifer.initialize(server);
-            Atlas.LOGGER.info("found aquifer data for dimension " + levelName + " in a " + this.aquifer.getWidth() + "x" + this.aquifer.getHeight() + " map: " + getAquiferPath());
-        } else {
-            Atlas.LOGGER.warn("couldn't find aquifer for dimension " + levelName + ", defaulting to sea level!");
-        }
-        if (!Objects.equals(this.getRoofPath(), "")) {
-            this.roof.initialize(server);
-            Atlas.LOGGER.info("found roof data for dimension " + levelName + " in a " + this.roof.getWidth() + "x" + this.roof.getHeight() + " map: " + getRoofPath());
-        }
-//        if (this.caveLayers.size() > 0) {
-//            for (CaveLayerEntry layer :
-//                    this.caveLayers) {
-//                layer.getCeiling().initialize(server);
-//                layer.getFloor().initialize(server);
-//                if (layer.getBiomes() != null) {
-//                    layer.getBiomes().initialize(server);
-//                }
-//                if (layer.getAquifer() != null) {
-//                    layer.getAquifer().initialize(server);
-//                }
-//            }
-//        }
+
+
+
+    private int getCeilingHeight() {
+        return this.ceilingHeight;
     }
+
+
+
+    private double getFromMap(int x, int z, @NotNull HeightProvider nmi) {
+        float xR = (x / horizontalScale);
+        float zR = (z / horizontalScale);
+
+        if (xR < 0 || zR < 0) return this.getMinimumY() - 1;
+        double d = nmi.lerp(x,z);
+        return this.verticalScale * d + startingY;
+    }
+
+    public RegistryEntry<ChunkGeneratorSettings> getSettings() {
+        return this.settings;
+    }
+
 
     public static final MapCodec<AtlasChunkGenerator> CODEC = RecordCodecBuilder.mapCodec(
             instance -> instance.group(
-                    AtlasMapInfo.REGISTRY_CODEC
-                            .fieldOf("map_info")
-                            .forGetter(AtlasChunkGenerator::getMapInfo),
                     Codec.STRING
                             .optionalFieldOf("aquifer", "")
                             .forGetter(AtlasChunkGenerator::getAquiferPath),
@@ -139,43 +124,17 @@ public class AtlasChunkGenerator extends ChunkGenerator {
                             .forGetter(AtlasChunkGenerator::getCeilingHeight)
             ).apply(instance, instance.stable(AtlasChunkGenerator::new))
     );
-
-    private int getCeilingHeight() {
-        return this.ceilingHeight;
-    }
-
-    private RegistryEntry<AtlasMapInfo> getMapInfo() {
-        return this.mapInfo;
-    }
-
     private String getRoofPath() {
-        return this.roof == null ? "" : (this.roof.getPath());
+        return "";
     }
 
-    private String getAquiferPath() {
-        return this.aquifer == null ? "" : (this.aquifer.getPath());
+    private static String getAquiferPath(Object o) {
+        return "";
     }
 
-    private double getFromMap(int x, int z, @NotNull NamespacedMapImage nmi) {
-        float xR = (x / horizontalScale);
-        float zR = (z / horizontalScale);
-        xR += nmi.getWidth() / 2f; // these will always be even numbers
-        zR += nmi.getHeight() / 2f;
-        if (xR < 0 || zR < 0 || xR >= nmi.getWidth() || zR >= nmi.getHeight()) return this.getMinimumY() - 1;
-        int truncatedX = (int) Math.floor(xR);
-        int truncatedZ = (int) Math.floor(zR);
-        double d = nmi.lerp(truncatedX, xR - truncatedX, truncatedZ, zR - truncatedZ);
-        return this.verticalScale * d + startingY;
-    }
-
-    public RegistryEntry<ChunkGeneratorSettings> getSettings() {
-        return this.settings;
-    }
-
-    private String getPath() {
-        return this.heightmap.getPath();
-    }
-
+    /**
+     * @return
+     */
     @Override
     protected MapCodec<? extends ChunkGenerator> getCodec() {
         return CODEC;
@@ -228,7 +187,7 @@ public class AtlasChunkGenerator extends ChunkGenerator {
     public void buildSurface(Chunk chunk, HeightContext heightContext, NoiseConfig noiseConfig, StructureAccessor structureAccessor, BiomeAccess biomeAccess, Registry<Biome> biomeRegistry, Blender blender) {
         ChunkNoiseSampler chunkNoiseSampler = chunk.getOrCreateChunkNoiseSampler(chunk3 -> this.createChunkNoiseSampler(chunk3, structureAccessor, blender, noiseConfig));
         ChunkGeneratorSettings chunkGeneratorSettings = this.settings.value();
-        ((AMISurfaceBuilderAccessor) noiseConfig.getSurfaceBuilder()).buildSurface(noiseConfig, biomeAccess, biomeRegistry, chunkGeneratorSettings.usesLegacyRandom(), heightContext, chunk, chunkNoiseSampler, chunkGeneratorSettings.surfaceRule(), this.mapInfo);
+        ( noiseConfig.getSurfaceBuilder()).buildSurface(noiseConfig, biomeAccess, biomeRegistry, chunkGeneratorSettings.usesLegacyRandom(), heightContext, chunk, chunkNoiseSampler, chunkGeneratorSettings.surfaceRule());
     }
 
     @Override
@@ -256,16 +215,12 @@ public class AtlasChunkGenerator extends ChunkGenerator {
         int z = chunk.getPos().z << 4;
         float xR = (x / horizontalScale);
         float zR = (z / horizontalScale);
-        xR += this.heightmap.getWidth() / 2f; // these will always be even numbers
-        zR += this.heightmap.getHeight() / 2f;
+
         int truncatedX = (int) Math.floor(xR);
         int truncatedZ = (int) Math.floor(zR);
         int minimumCellY = MathHelper.floorDiv(generationShapeConfig.minimumY(), generationShapeConfig.verticalCellBlockCount());
         int cellHeight = MathHelper.floorDiv(generationShapeConfig.height(), generationShapeConfig.verticalCellBlockCount());
-        if (truncatedX < -16 || truncatedZ < -16 || truncatedX > this.heightmap.getWidth() || truncatedZ > this.heightmap.getHeight())
-            return CompletableFuture.completedFuture(chunk);
-        this.heightmap.loadPixelsInRange(truncatedX, truncatedZ, true, Atlas.GEN_RADIUS);
-        if (this.aquifer != null) this.aquifer.loadPixelsInRange(truncatedX, truncatedZ, true, Atlas.GEN_RADIUS);
+        if (truncatedX < -16 || truncatedZ < -16) return CompletableFuture.completedFuture(chunk);
         return CompletableFuture.supplyAsync(Util.debugSupplier("wgen_fill_noise", () -> this.populateNoise(chunk, structureAccessor, blender, noiseConfig, minimumCellY, cellHeight)), Util.getMainWorkerExecutor());
     }
 
@@ -378,9 +333,6 @@ public class AtlasChunkGenerator extends ChunkGenerator {
     }
 
     public int getSeaLevel(int x, int z) {
-        if (this.aquifer != null) {
-            return (int) Math.min(Math.max(this.getFromMap(x, z, this.aquifer), this.seaLevel), this.startingY + this.getWorldHeight());
-        }
         return seaLevel;
     }
 
@@ -438,10 +390,10 @@ public class AtlasChunkGenerator extends ChunkGenerator {
                 return fluidLevel;
             }
 //            else if (this.getFromMap(x, z, this.heightmap) < (this.aquifer == null ? this.seaLevel : this.getFromMap(x, z, this.aquifer))) {
-            return new AquiferSampler.FluidLevel((this.aquifer == null ? this.seaLevel : ((int) this.getFromMap(x, z, this.aquifer))), settings.defaultFluid());
+            return new AquiferSampler.FluidLevel(this.seaLevel, settings.defaultFluid());
 //            }
 //            return fluidLevel3;
         };
     }
-}
 
+}
