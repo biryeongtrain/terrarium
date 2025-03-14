@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
 public class Atlas implements ModInitializer {
     public static final String MOD_ID = "atlas";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-    public static MinecraftServer SERVER;
 
     public static Identifier id(String path) {
         return Identifier.of(MOD_ID, path);

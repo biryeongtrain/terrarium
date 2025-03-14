@@ -1,7 +1,6 @@
 package com.miir.atlas.world.gen.chunk;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.miir.atlas.Atlas;
 import com.miir.atlas.world.gen.HeightProvider;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -12,7 +11,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -43,11 +41,8 @@ import net.minecraft.world.gen.chunk.*;
 import net.minecraft.world.gen.noise.NoiseConfig;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 import java.util.stream.Stream;
 
 public class AtlasChunkGenerator extends ChunkGenerator {
