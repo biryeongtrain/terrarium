@@ -1,6 +1,7 @@
 package com.miir.atlas.world.gen.chunk;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.miir.atlas.accessor.AMISurfaceBuilderAccessor;
 import com.miir.atlas.world.gen.HeightProvider;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -86,13 +87,13 @@ public class AtlasChunkGenerator extends ChunkGenerator {
 
 
 
-    private double getFromMap(int x, int z, @NotNull HeightProvider nmi) {
+    private int getFromMap(int x, int z, @NotNull HeightProvider nmi) {
         float xR = (x / horizontalScale);
         float zR = (z / horizontalScale);
 
         if (xR < 0 || zR < 0) return this.getMinimumY() - 1;
-        double d = nmi.getElevation(x,z);
-        return this.verticalScale * d + startingY;
+        int d = nmi.getElevation(x,z);
+        return (int) (this.verticalScale * d + startingY);
     }
 
     public RegistryEntry<ChunkGeneratorSettings> getSettings() {
@@ -128,7 +129,6 @@ public class AtlasChunkGenerator extends ChunkGenerator {
     }
 
     /**
-     * @return
      */
     @Override
     protected MapCodec<? extends ChunkGenerator> getCodec() {
@@ -182,7 +182,7 @@ public class AtlasChunkGenerator extends ChunkGenerator {
     public void buildSurface(Chunk chunk, HeightContext heightContext, NoiseConfig noiseConfig, StructureAccessor structureAccessor, BiomeAccess biomeAccess, Registry<Biome> biomeRegistry, Blender blender) {
         ChunkNoiseSampler chunkNoiseSampler = chunk.getOrCreateChunkNoiseSampler(chunk3 -> this.createChunkNoiseSampler(chunk3, structureAccessor, blender, noiseConfig));
         ChunkGeneratorSettings chunkGeneratorSettings = this.settings.value();
-        ( noiseConfig.getSurfaceBuilder()).buildSurface(noiseConfig, biomeAccess, biomeRegistry, chunkGeneratorSettings.usesLegacyRandom(), heightContext, chunk, chunkNoiseSampler, chunkGeneratorSettings.surfaceRule());
+        ((AMISurfaceBuilderAccessor) noiseConfig.getSurfaceBuilder()).buildSurface(noiseConfig, biomeAccess, biomeRegistry, chunkGeneratorSettings.usesLegacyRandom(), heightContext, chunk, chunkNoiseSampler, chunkGeneratorSettings.surfaceRule());
     }
 
     @Override
