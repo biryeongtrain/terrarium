@@ -1,7 +1,6 @@
 package com.miir.atlas.accessor;
 
 import net.minecraft.registry.Registry;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeAccess;
 import net.minecraft.world.chunk.Chunk;
@@ -17,7 +16,7 @@ public interface AMISurfaceBuilderAccessor {
             Registry<Biome> biomeRegistry,
             boolean useLegacyRandom,
             HeightContext heightContext,
-            final Chunk chunk,
+            Chunk chunk,
             ChunkNoiseSampler chunkNoiseSampler,
             MaterialRules.MaterialRule materialRule
     );
