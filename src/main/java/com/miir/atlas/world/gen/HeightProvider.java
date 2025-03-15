@@ -2,6 +2,7 @@ package com.miir.atlas.world.gen;
 
 
 import com.miir.atlas.Atlas;
+import com.miir.atlas.world.gen.chunk.AtlasChunkGenerator;
 import org.slf4j.Logger;
 
 import javax.imageio.ImageIO;
@@ -17,6 +18,8 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.miir.atlas.world.gen.chunk.AtlasChunkGenerator.zoom;
+
 
 public class HeightProvider {
     private final int maxHeight;
@@ -24,7 +27,7 @@ public class HeightProvider {
     private static final String TILE_URL = "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/";
     private static final Logger LOGGER = Atlas.LOGGER;
 
-    private static Map<Long, Integer> cache = new ConcurrentHashMap<Long, Integer>();
+    private static Map<Long, BufferedImage> cache = new ConcurrentHashMap<>();
 
     public HeightProvider(int maxHeight) {
         this.maxHeight = maxHeight;
@@ -33,26 +36,17 @@ public class HeightProvider {
 
 
 
-    private int getElevationFromHeightmap(int x, int z, int zoom) {
-        int xTile = x / 256;
-        int yTile = z / 256;
-        int xPixel = x - xTile * 256;
-        int yPixel = z - yTile * 256;
-        String cachePath = CACHE_DIR + zoom + "/" + xTile + "/" + yTile + ".png";
-        String urlString = TILE_URL + zoom + "/" + xTile + "/" + yTile + ".png";
+    private boolean getElevationFromHeightmap(int xTile, int zTile) {
+
+
+        String cachePath = CACHE_DIR + zoom + "/" + xTile + "/" + zTile + ".png";
+        String urlString = TILE_URL + zoom + "/" + xTile + "/" + zTile + ".png";
         //System.out.println(xPixel);
         //System.out.println(yPixel);
         File cacheFile = new File(cachePath);
         if (cacheFile.exists()) {
             try {
-                BufferedImage tileImage = ImageIO.read(cacheFile);
-                for(int i = 0; i < tileImage.getWidth(); i++) {
-                    for(int k = 0; k < tileImage.getHeight(); k++) {
-                        Color rgb = new Color(tileImage.getRGB(i,k));
-                        double elevation = (rgb.getRed() * 256 + rgb.getGreen() + rgb.getBlue() / 256.0) - 32768;
-                        cache.put(pack(x + i, z + k),(int) ((elevation / 8840) * maxHeight) + 80); // TODO: Remove temp vars
-                    }
-                }
+                cache.put(pack(xTile, zTile), ImageIO.read(cacheFile));
 
             } catch (IOException e) {
                 LOGGER.error("Failed to load tile from cache: {}", e.getMessage());
@@ -73,34 +67,47 @@ public class HeightProvider {
                     }
                     ImageIO.write(tileImage, "png", cacheFile);
 
-                    for(int i = 0; i < tileImage.getWidth(); i++) {
-                        for(int k = 0; k < tileImage.getHeight(); k++) {
-                            Color rgb = new Color(tileImage.getRGB(i,k));
-                            double elevation = (rgb.getRed() * 256 + rgb.getGreen() + rgb.getBlue() / 256.0) - 32768;
-                            cache.put(pack(x + i, z + k),(int) (elevation / 8840) * maxHeight); // TODO: Remove temp vars
-                        }
-                    }
+                    cache.put(pack(xTile, zTile), tileImage);
                 }
             } catch (IOException e) {
                 LOGGER.error("Failed to download tile: {}", e.getMessage());
-                return 64;
+                //cache.put(pack(x,z), 64);
+                return false;
             }
         }
-        if(cache.get(pack(x,z)) == null){
-            return 64;
-        } return cache.get(pack(x,z));
+        return true;
+    }
+    public int getFromImageCache(int x, int z){
+        int xTile = x / 256;
+        int zTile = z / 256;
+        int xPixel = x - (xTile * 256);
+        int zPixel = z - (zTile * 256);
+        long key = pack(xTile,zTile);
+
+        if(!cache.containsKey(key)){
+            getElevationFromHeightmap(xTile, zTile);
+        }
+        if(cache.containsKey(key)) {
+            Color rgb = new Color(cache.get(key).getRGB(xPixel, zPixel));
+            double elevation = (rgb.getRed() * 256 + rgb.getGreen() + rgb.getBlue() / 256.0) - 32768;
+            //System.out.println(elevation);
+            return (int) ((elevation / 8840) * maxHeight);
+        }
+        return 64;
     }
 
-    public int checkCache(int x, int z){
-        long key = pack(x, z);
-        if(cache.containsKey(key)){
-            return cache.get(key);
-        }
-         return getElevationFromHeightmap(x, z, 4);
-    }
+
 
     public int getElevation(int x, int z) {
-        return checkCache(x, z);
+        int size = (int) (Math.pow(2, zoom) * 256);
+        if(cache.size() > 128){
+            cache.clear();
+        }
+        if(x > size || z > size){
+            return 64;
+        }
+        //System.out.println(getFromImageCache(x, z));
+        return getFromImageCache(x,z);
     }
 
     public static long pack(int x, int z) {

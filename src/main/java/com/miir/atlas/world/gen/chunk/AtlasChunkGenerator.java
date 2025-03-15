@@ -55,22 +55,26 @@ public class AtlasChunkGenerator extends ChunkGenerator {
     private final RegistryEntry<ChunkGeneratorSettings> settings;
     private final float verticalScale;
     private final float horizontalScale;
-
+    private final int worldHeight = 32;
+    public static int zoom = 4;
 
     public AtlasChunkGenerator(
-            String aquiferPath, String roofPath,
+            int startingY, int worldHeight,
             BiomeSource biomeSource, RegistryEntry<ChunkGeneratorSettings> settings,
             int ceilingHeight
     ) {
         super(biomeSource);
 
         this.seaLevel = settings.value().seaLevel();
-        this.startingY = 64;
+        this.startingY = startingY;
         this.ceilingHeight = ceilingHeight;
         this.verticalScale = 1;
         this.horizontalScale = 1;
-        this.heightmap = new HeightProvider(320);
+
+
+        this.heightmap = new HeightProvider(this.worldHeight);
         this.settings = settings;
+
     }
 
 
@@ -80,15 +84,21 @@ public class AtlasChunkGenerator extends ChunkGenerator {
         return this.ceilingHeight;
     }
 
+    private int getScale() {
+        return this.worldHeight;
+    }
+
+    private int getStartingY() {
+        return this.startingY;
+    }
 
 
     private int getFromMap(int x, int z, @NotNull HeightProvider nmi) {
         float xR = (x / horizontalScale);
         float zR = (z / horizontalScale);
-
+        //System.out.println("Zoom: " + zoom);
         if (xR < 0 || zR < 0) return this.getMinimumY() - 1;
-        int d = nmi.getElevation(x,z);
-        return (int) (this.verticalScale * d + startingY);
+        return nmi.getElevation(x,z) + startingY;
     }
 
     public RegistryEntry<ChunkGeneratorSettings> getSettings() {
@@ -98,12 +108,12 @@ public class AtlasChunkGenerator extends ChunkGenerator {
 
     public static final MapCodec<AtlasChunkGenerator> CODEC = RecordCodecBuilder.mapCodec(
             instance -> instance.group(
-                    Codec.STRING
-                            .optionalFieldOf("aquifer", "")
-                            .forGetter(AtlasChunkGenerator::getAquiferPath),
-                    Codec.STRING
-                            .optionalFieldOf("roof", "")
-                            .forGetter(AtlasChunkGenerator::getRoofPath),
+                    Codec.INT
+                            .optionalFieldOf("starting_y", 64)
+                            .forGetter(AtlasChunkGenerator::getStartingY),
+                    Codec.INT
+                            .optionalFieldOf("world_height",16)
+                            .forGetter(AtlasChunkGenerator::getScale),
                     BiomeSource.CODEC
                             .fieldOf("biome_source")
                             .forGetter(AtlasChunkGenerator::getBiomeSource),
@@ -115,13 +125,9 @@ public class AtlasChunkGenerator extends ChunkGenerator {
                             .forGetter(AtlasChunkGenerator::getCeilingHeight)
             ).apply(instance, instance.stable(AtlasChunkGenerator::new))
     );
-    private String getRoofPath() {
-        return "";
-    }
 
-    private static String getAquiferPath(Object o) {
-        return "";
-    }
+
+
 
     /**
      */
