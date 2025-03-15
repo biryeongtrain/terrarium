@@ -10,25 +10,6 @@ import net.minecraft.world.gen.noise.NoiseConfig;
 import net.minecraft.world.gen.surfacebuilder.MaterialRules;
 
 public interface AMISurfaceBuilderAccessor {
-    void buildSurface(
-            NoiseConfig noiseConfig,
-            BiomeAccess biomeAccess,
-            Registry<Biome> biomeRegistry,
-            boolean useLegacyRandom,
-            HeightContext heightContext,
-            Chunk chunk,
-            ChunkNoiseSampler chunkNoiseSampler,
-            MaterialRules.MaterialRule materialRule
-    );
+    void buildSurface(NoiseConfig noiseConfig, BiomeAccess biomeAccess, Registry<Biome> biomeRegistry, boolean useLegacyRandom, HeightContext heightContext, final Chunk chunk, ChunkNoiseSampler chunkNoiseSampler, MaterialRules.MaterialRule materialRule);
 
 }
-/*
-   NoiseConfig noiseConfig,
-    BiomeAccess biomeAccess,
-    Registry<Biome> biomeRegistry,
-    boolean useLegacyRandom,
-    HeightContext heightContext,
-    Chunk chunk,
-    ChunkNoiseSampler chunkNoiseSampler,
-    MaterialRules.MaterialRule materialRule
-*/

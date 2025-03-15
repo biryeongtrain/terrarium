@@ -263,46 +263,26 @@ public class AtlasChunkGenerator extends ChunkGenerator {
                                 int blockZ = chunkNoiseSampler.blockZ();
                                 mutable.set(blockX, blockY, blockZ);
                                 int seaLevel = this.getSeaLevel(blockX, blockZ);
-                                int elevation = (int) Math.min(this.getFromMap(blockX, blockZ, this.heightmap), this.startingY + this.getWorldHeight());
-                                if (blockY >= seaLevel && blockY >= elevation || elevation < this.getMinimumY())
-                                    continue;
+                                int elevation = this.getFromMap(blockX, blockZ, this.heightmap);
+                                //if (blockY >= seaLevel && blockY >= elevation || elevation < this.getMinimumY())
+                                   // continue;
                                 int height = blockY - minY;
                                 int maxHeight = elevation - minY;
                                 double cave;
                                 BlockState state;
-                                if (maxHeight - height <= 10) {
-                                    cave = noiseConfig.getNoiseRouter().initialDensityWithoutJaggedness().sample(chunkNoiseSampler);
-                                    BlockState caveAir;
-                                    if (elevation < seaLevel) {
-                                        caveAir = defaultFluid;
-                                    } else {
-                                        caveAir = AIR;
-                                    }
-                                    if (blockY < elevation) {
-                                        if (cave > 0) {
-                                            state = defaultBlock;
-                                        } else {
-                                            state = caveAir;
-                                        }
-                                    } else if (blockY < seaLevel) {
-                                        state = defaultFluid;
-                                    } else {
-                                        state = AIR;
-                                    }
-                                    chunk.setBlockState(mutable, state, false);
-                                    surfaceHeightmap.trackUpdate(blockX & 0xF, blockY, blockZ & 0xF, state);
-                                    oceanHeightmap.trackUpdate(blockX & 0xF, blockY, blockZ & 0xF, state);
-                                } else {
-                                    state = chunkNoiseSampler.sampleBlockState();
-                                    if (state == null) {
-                                        state = this.settings.value().defaultBlock();
-                                    }
-                                    if ((state == AIR || SharedConstants.isOutsideGenerationArea(chunk.getPos())))
-                                        continue;
-                                    chunkSection.setBlockState(x, t, aa, state, false);
-                                    oceanHeightmap.trackUpdate(x, s, aa, state);
-                                    surfaceHeightmap.trackUpdate(x, s, aa, state);
+                                if(blockY <= seaLevel && blockY >= elevation){
+                                    state = defaultFluid;
                                 }
+                                else if(blockY < elevation){
+                                    state = defaultBlock;
+                                }
+                                else {
+                                    state = AIR;
+                                }
+                                chunkSection.setBlockState(x, t, aa, state, false);
+                                oceanHeightmap.trackUpdate(x, s, aa, state);
+                                surfaceHeightmap.trackUpdate(x, s, aa, state);
+
                                 if (!aquiferSampler.needsFluidTick() || state.getFluidState().isEmpty()) continue;
                                 mutable.set(w, s, z);
                                 chunk.markBlockForPostProcessing(mutable);

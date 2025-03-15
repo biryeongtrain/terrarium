@@ -1,6 +1,7 @@
 package com.miir.atlas.mixin;
 
 import com.miir.atlas.accessor.AMISurfaceBuilderAccessor;
+import com.miir.atlas.accessor.HeightProviderAccessor;
 import net.minecraft.block.BlockState;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -62,7 +63,7 @@ public abstract class SurfaceBuilderMixin implements AMISurfaceBuilderAccessor {
             }
         };
         MaterialRules.MaterialRuleContext materialRuleContext = MaterialRuleContextAccessor.createMaterialRuleContext((((SurfaceBuilder) (Object) this)), noiseConfig, chunk, chunkNoiseSampler, biomeAccess::getBiome, biomeRegistry, heightContext);
-       // ((MapInfoAccessor)(Object) materialRuleContext).atlas_setAMI(ami);
+        //((HeightProviderAccessor)(Object) materialRuleContext).atlas_setAMI();
         MaterialRules.BlockStateRule blockStateRule = materialRule.apply(materialRuleContext);
         BlockPos.Mutable mutable2 = new BlockPos.Mutable();
         for (int k = 0; k < 16; ++k) {

@@ -77,7 +77,7 @@ public class HeightProvider {
                         for(int k = 0; k < tileImage.getHeight(); k++) {
                             Color rgb = new Color(tileImage.getRGB(i,k));
                             double elevation = (rgb.getRed() * 256 + rgb.getGreen() + rgb.getBlue() / 256.0) - 32768;
-                            cache.put(pack(x + i, z + k),(int) ((elevation / 8840) * maxHeight) + 80); // TODO: Remove temp vars
+                            cache.put(pack(x + i, z + k),(int) (elevation / 8840) * maxHeight); // TODO: Remove temp vars
                         }
                     }
                 }
@@ -86,7 +86,9 @@ public class HeightProvider {
                 return 64;
             }
         }
-        return cache.get(pack(x,z));
+        if(cache.get(pack(x,z)) == null){
+            return 64;
+        } return cache.get(pack(x,z));
     }
 
     public int checkCache(int x, int z){
@@ -94,7 +96,7 @@ public class HeightProvider {
         if(cache.containsKey(key)){
             return cache.get(key);
         }
-         return getElevationFromHeightmap(x, z, 15);
+         return getElevationFromHeightmap(x, z, 4);
     }
 
     public int getElevation(int x, int z) {
