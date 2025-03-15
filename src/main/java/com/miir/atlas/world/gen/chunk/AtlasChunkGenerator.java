@@ -55,8 +55,8 @@ public class AtlasChunkGenerator extends ChunkGenerator {
     private final RegistryEntry<ChunkGeneratorSettings> settings;
     private final float verticalScale;
     private final float horizontalScale;
-    private final int worldHeight = 32;
-    public static int zoom = 4;
+    private final int worldHeight = 42;
+    public static int zoom = 7;
 
     public AtlasChunkGenerator(
             int startingY, int worldHeight,
