@@ -2,6 +2,7 @@ package com.miir.atlas.mixin;
 
 import com.miir.atlas.accessor.AMISurfaceBuilderAccessor;
 import com.miir.atlas.accessor.HeightProviderAccessor;
+import com.miir.atlas.world.gen.HeightProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -35,7 +36,7 @@ public abstract class SurfaceBuilderMixin implements AMISurfaceBuilderAccessor {
     @Shadow protected abstract void placeIceberg(int minY, Biome biome, BlockColumn column, BlockPos.Mutable mutablePos, int x, int z, int surfaceY);
 
     @Override
-    public void buildSurface(NoiseConfig noiseConfig, BiomeAccess biomeAccess, Registry<Biome> biomeRegistry, boolean useLegacyRandom, HeightContext heightContext, final Chunk chunk, ChunkNoiseSampler chunkNoiseSampler, MaterialRules.MaterialRule materialRule) {
+    public void atlas$buildSurface(NoiseConfig noiseConfig, BiomeAccess biomeAccess, Registry<Biome> biomeRegistry, boolean useLegacyRandom, HeightContext heightContext, final Chunk chunk, ChunkNoiseSampler chunkNoiseSampler, MaterialRules.MaterialRule materialRule, RegistryEntry<HeightProvider> ami) {
         final BlockPos.Mutable mutable = new BlockPos.Mutable();
         final ChunkPos chunkPos = chunk.getPos();
         int i = chunkPos.getStartX();
@@ -63,7 +64,7 @@ public abstract class SurfaceBuilderMixin implements AMISurfaceBuilderAccessor {
             }
         };
         MaterialRules.MaterialRuleContext materialRuleContext = MaterialRuleContextAccessor.createMaterialRuleContext((((SurfaceBuilder) (Object) this)), noiseConfig, chunk, chunkNoiseSampler, biomeAccess::getBiome, biomeRegistry, heightContext);
-        //((HeightProviderAccessor)(Object) materialRuleContext).atlas_setAMI();
+        ((HeightProviderAccessor)(Object) materialRuleContext).atlas_setAMI(ami);
         MaterialRules.BlockStateRule blockStateRule = materialRule.apply(materialRuleContext);
         BlockPos.Mutable mutable2 = new BlockPos.Mutable();
         for (int k = 0; k < 16; ++k) {

@@ -2,7 +2,6 @@ package com.miir.atlas.world.gen;
 
 
 import com.miir.atlas.Atlas;
-import com.miir.atlas.world.gen.chunk.AtlasChunkGenerator;
 import org.slf4j.Logger;
 
 import javax.imageio.ImageIO;
@@ -35,8 +34,8 @@ public class HeightProvider {
     }
 
 
-
-    private boolean getElevationFromHeightmap(int xTile, int zTile) {
+    @Deprecated
+    private void getElevationFromHeightmap(int xTile, int zTile) {
 
 
         String cachePath = CACHE_DIR + zoom + "/" + xTile + "/" + zTile + ".png";
@@ -72,10 +71,8 @@ public class HeightProvider {
             } catch (IOException e) {
                 LOGGER.error("Failed to download tile: {}", e.getMessage());
                 //cache.put(pack(x,z), 64);
-                return false;
             }
         }
-        return true;
     }
     public int getFromImageCache(int x, int z){
         int xTile = x / 256;
