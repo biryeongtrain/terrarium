@@ -47,7 +47,7 @@ public class HeightProvider {
             try {
                 cache.put(pack(xTile, zTile), ImageIO.read(cacheFile));
 
-            } catch (IOException e) {
+            } catch (Exception e) {
                 LOGGER.error("Failed to load tile from cache: {}", e.getMessage());
             }
         }

@@ -7,6 +7,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.SharedConstants;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.registry.Registry;
@@ -55,9 +56,10 @@ public class AtlasChunkGenerator extends ChunkGenerator {
     private final RegistryEntry<ChunkGeneratorSettings> settings;
     private final float verticalScale;
     private final float horizontalScale;
-    private final int worldHeight = 42;
-    public static int zoom = 7;
-
+    private final int worldHeight = 320;
+    public static int zoom = 11;
+    private static BlockState[] blocks = new BlockState[64];
+    private static BlockState[] possible = {Blocks.TERRACOTTA.getDefaultState(), Blocks.RED_TERRACOTTA.getDefaultState(), Blocks.ORANGE_TERRACOTTA.getDefaultState(), Blocks.YELLOW_TERRACOTTA.getDefaultState(), Blocks.WHITE_TERRACOTTA.getDefaultState(), Blocks.BROWN_TERRACOTTA.getDefaultState()};
     public AtlasChunkGenerator(
             int startingY, int worldHeight,
             BiomeSource biomeSource, RegistryEntry<ChunkGeneratorSettings> settings,
@@ -74,6 +76,10 @@ public class AtlasChunkGenerator extends ChunkGenerator {
 
         this.heightmap = new HeightProvider(this.worldHeight);
         this.settings = settings;
+
+        for(int i = 0; i < blocks.length; i++){
+            blocks[i] = possible[(int) (Math.random() * possible.length)];
+        }
 
     }
 
@@ -112,7 +118,7 @@ public class AtlasChunkGenerator extends ChunkGenerator {
                             .optionalFieldOf("starting_y", 64)
                             .forGetter(AtlasChunkGenerator::getStartingY),
                     Codec.INT
-                            .optionalFieldOf("world_height",16)
+                            .optionalFieldOf("world_height",320)
                             .forGetter(AtlasChunkGenerator::getScale),
                     BiomeSource.CODEC
                             .fieldOf("biome_source")
@@ -280,7 +286,7 @@ public class AtlasChunkGenerator extends ChunkGenerator {
                                     state = defaultFluid;
                                 }
                                 else if(blockY < elevation){
-                                    state = defaultBlock;
+                                    state = getBlockAtElevation(blockY);
                                 }
                                 else {
                                     state = AIR;
@@ -370,6 +376,11 @@ public class AtlasChunkGenerator extends ChunkGenerator {
 //            }
 //            return fluidLevel3;
         };
+    }
+
+    private BlockState getBlockAtElevation(int y){
+        int i = worldHeight/ blocks.length;
+        return blocks[Math.max(y / i, 0)];
     }
 
 }
