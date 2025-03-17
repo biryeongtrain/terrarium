@@ -3,11 +3,11 @@ package com.miir.atlas.world.gen.chunk;
 import com.google.common.annotations.VisibleForTesting;
 import com.miir.atlas.accessor.AMISurfaceBuilderAccessor;
 import com.miir.atlas.world.gen.HeightProvider;
+import com.miir.atlas.world.gen.surface.providers.Badlands;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.SharedConstants;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.registry.Registry;
@@ -47,34 +47,31 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
+import static com.miir.atlas.Atlas.CONFIG;
+
 public class AtlasChunkGenerator extends ChunkGenerator {
     private static final BlockState AIR = Blocks.AIR.getDefaultState();
     private final HeightProvider heightmap;
     private final int seaLevel;
-    private final int startingY;
     private final int ceilingHeight;
     private final RegistryEntry<ChunkGeneratorSettings> settings;
     private final float verticalScale;
     private final float horizontalScale;
-    private final int worldHeight = 320;
-    public static int zoom = 11;
     private static BlockState[] blocks = new BlockState[64];
     private static BlockState[] possible = {Blocks.TERRACOTTA.getDefaultState(), Blocks.RED_TERRACOTTA.getDefaultState(), Blocks.ORANGE_TERRACOTTA.getDefaultState(), Blocks.YELLOW_TERRACOTTA.getDefaultState(), Blocks.WHITE_TERRACOTTA.getDefaultState(), Blocks.BROWN_TERRACOTTA.getDefaultState()};
     public AtlasChunkGenerator(
-            int startingY, int worldHeight,
             BiomeSource biomeSource, RegistryEntry<ChunkGeneratorSettings> settings,
             int ceilingHeight
     ) {
         super(biomeSource);
 
         this.seaLevel = settings.value().seaLevel();
-        this.startingY = startingY;
         this.ceilingHeight = ceilingHeight;
         this.verticalScale = 1;
         this.horizontalScale = 1;
 
 
-        this.heightmap = new HeightProvider(this.worldHeight);
+        this.heightmap = new HeightProvider(CONFIG.worldHeight);
         this.settings = settings;
 
         for(int i = 0; i < blocks.length; i++){
@@ -91,11 +88,11 @@ public class AtlasChunkGenerator extends ChunkGenerator {
     }
 
     private int getScale() {
-        return this.worldHeight;
+        return CONFIG.worldHeight;
     }
 
     private int getStartingY() {
-        return this.startingY;
+        return CONFIG.startingY;
     }
 
 
@@ -104,7 +101,7 @@ public class AtlasChunkGenerator extends ChunkGenerator {
         float zR = (z / horizontalScale);
         //System.out.println("Zoom: " + zoom);
         if (xR < 0 || zR < 0) return this.getMinimumY() - 1;
-        return nmi.getElevation(x,z) + startingY;
+        return nmi.getElevation(x,z) + CONFIG.startingY;
     }
 
     public RegistryEntry<ChunkGeneratorSettings> getSettings() {
@@ -114,12 +111,6 @@ public class AtlasChunkGenerator extends ChunkGenerator {
 
     public static final MapCodec<AtlasChunkGenerator> CODEC = RecordCodecBuilder.mapCodec(
             instance -> instance.group(
-                    Codec.INT
-                            .optionalFieldOf("starting_y", 64)
-                            .forGetter(AtlasChunkGenerator::getStartingY),
-                    Codec.INT
-                            .optionalFieldOf("world_height",320)
-                            .forGetter(AtlasChunkGenerator::getScale),
                     BiomeSource.CODEC
                             .fieldOf("biome_source")
                             .forGetter(AtlasChunkGenerator::getBiomeSource),
@@ -286,7 +277,7 @@ public class AtlasChunkGenerator extends ChunkGenerator {
                                     state = defaultFluid;
                                 }
                                 else if(blockY < elevation){
-                                    state = getBlockAtElevation(blockY);
+                                    state = Badlands.getBlock(blockX, blockZ, blockY);
                                 }
                                 else {
                                     state = AIR;
@@ -378,9 +369,5 @@ public class AtlasChunkGenerator extends ChunkGenerator {
         };
     }
 
-    private BlockState getBlockAtElevation(int y){
-        int i = worldHeight/ blocks.length;
-        return blocks[Math.max(y / i, 0)];
-    }
 
 }

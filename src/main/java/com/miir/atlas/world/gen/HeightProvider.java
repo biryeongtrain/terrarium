@@ -17,7 +17,7 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.miir.atlas.world.gen.chunk.AtlasChunkGenerator.zoom;
+import static com.miir.atlas.Atlas.CONFIG;
 
 
 public class HeightProvider {
@@ -38,8 +38,8 @@ public class HeightProvider {
     private void getElevationFromHeightmap(int xTile, int zTile) {
 
 
-        String cachePath = CACHE_DIR + zoom + "/" + xTile + "/" + zTile + ".png";
-        String urlString = TILE_URL + zoom + "/" + xTile + "/" + zTile + ".png";
+        String cachePath = CACHE_DIR + CONFIG.zoom + "/" + xTile + "/" + zTile + ".png";
+        String urlString = TILE_URL + CONFIG.zoom + "/" + xTile + "/" + zTile + ".png";
         //System.out.println(xPixel);
         //System.out.println(yPixel);
         File cacheFile = new File(cachePath);
@@ -88,7 +88,7 @@ public class HeightProvider {
             Color rgb = new Color(cache.get(key).getRGB(xPixel, zPixel));
             double elevation = (rgb.getRed() * 256 + rgb.getGreen() + rgb.getBlue() / 256.0) - 32768;
             //System.out.println(elevation);
-            return (int) ((elevation / 8840) * maxHeight);
+            return (int) (((elevation / 8850) * maxHeight) * ((-CONFIG.altitudeDropoff * (elevation/8850)) + CONFIG.additionalAlt));
         }
         return 64;
     }
@@ -96,7 +96,7 @@ public class HeightProvider {
 
 
     public int getElevation(int x, int z) {
-        int size = (int) (Math.pow(2, zoom) * 256);
+        int size = (int) (Math.pow(2, CONFIG.zoom) * 256);
         if(cache.size() > 128){
             cache.clear();
         }
