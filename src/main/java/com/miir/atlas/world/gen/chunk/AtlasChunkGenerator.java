@@ -48,6 +48,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 import static com.miir.atlas.Atlas.CONFIG;
+import static com.miir.atlas.world.gen.SurfaceBlockProvider.getBlock;
 
 public class AtlasChunkGenerator extends ChunkGenerator {
     private static final BlockState AIR = Blocks.AIR.getDefaultState();
@@ -277,7 +278,7 @@ public class AtlasChunkGenerator extends ChunkGenerator {
                                     state = defaultFluid;
                                 }
                                 else if(blockY < elevation){
-                                    state = Badlands.getBlock(blockX, blockZ, blockY);
+                                    state = getBlock(blockX, blockZ, blockY);
                                 }
                                 else {
                                     state = AIR;
