@@ -5,6 +5,7 @@ import net.minecraft.block.Blocks;
 
 public class BadlandsConfig{
     double tilt = 10.0;
+    double scale = 0.1;
     int minY = 64;
     int maxY = 256;
     float latitudeMin = 0;

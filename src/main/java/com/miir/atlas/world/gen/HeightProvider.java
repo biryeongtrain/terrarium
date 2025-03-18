@@ -21,21 +21,16 @@ import static com.miir.atlas.Atlas.CONFIG;
 
 
 public class HeightProvider {
-    private final int maxHeight;
     private static final String CACHE_DIR = "./world/tiles/";
     private static final String TILE_URL = "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/";
     private static final Logger LOGGER = Atlas.LOGGER;
 
     private static Map<Long, BufferedImage> cache = new ConcurrentHashMap<>();
 
-    public HeightProvider(int maxHeight) {
-        this.maxHeight = maxHeight;
-
-    }
 
 
     @Deprecated
-    private void getElevationFromHeightmap(int xTile, int zTile) {
+    private static void getElevationFromHeightmap(int xTile, int zTile) {
 
 
         String cachePath = CACHE_DIR + CONFIG.zoom + "/" + xTile + "/" + zTile + ".png";
@@ -74,7 +69,7 @@ public class HeightProvider {
             }
         }
     }
-    public int getFromImageCache(int x, int z){
+    private static int getFromImageCache(int x, int z){
         int xTile = x / 256;
         int zTile = z / 256;
         int xPixel = x - (xTile * 256);
@@ -88,14 +83,14 @@ public class HeightProvider {
             Color rgb = new Color(cache.get(key).getRGB(xPixel, zPixel));
             double elevation = (rgb.getRed() * 256 + rgb.getGreen() + rgb.getBlue() / 256.0) - 32768;
             //System.out.println(elevation);
-            return (int) (((elevation / 8850) * maxHeight) * ((-CONFIG.altitudeDropoff * (elevation/8850)) + CONFIG.additionalAlt));
+            return (int) (((elevation / 8850) * CONFIG.worldHeight) * ((-CONFIG.altitudeDropoff * (elevation/8850)) + CONFIG.additionalAlt));
         }
         return 64;
     }
 
 
 
-    public int getElevation(int x, int z) {
+    public static int getElevation(int x, int z) {
         int size = (int) (Math.pow(2, CONFIG.zoom) * 256);
         if(cache.size() > 128){
             cache.clear();

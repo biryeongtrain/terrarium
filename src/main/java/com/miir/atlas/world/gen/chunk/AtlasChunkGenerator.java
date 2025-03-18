@@ -48,15 +48,14 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 import static com.miir.atlas.Atlas.CONFIG;
+import static com.miir.atlas.world.gen.HeightProvider.getElevation;
 import static com.miir.atlas.world.gen.SurfaceBlockProvider.getBlock;
 
 public class AtlasChunkGenerator extends ChunkGenerator {
     private static final BlockState AIR = Blocks.AIR.getDefaultState();
-    private final HeightProvider heightmap;
     private final int seaLevel;
     private final int ceilingHeight;
     private final RegistryEntry<ChunkGeneratorSettings> settings;
-    private final float verticalScale;
     private final float horizontalScale;
     private static BlockState[] blocks = new BlockState[64];
     private static BlockState[] possible = {Blocks.TERRACOTTA.getDefaultState(), Blocks.RED_TERRACOTTA.getDefaultState(), Blocks.ORANGE_TERRACOTTA.getDefaultState(), Blocks.YELLOW_TERRACOTTA.getDefaultState(), Blocks.WHITE_TERRACOTTA.getDefaultState(), Blocks.BROWN_TERRACOTTA.getDefaultState()};
@@ -68,11 +67,9 @@ public class AtlasChunkGenerator extends ChunkGenerator {
 
         this.seaLevel = settings.value().seaLevel();
         this.ceilingHeight = ceilingHeight;
-        this.verticalScale = 1;
         this.horizontalScale = 1;
 
 
-        this.heightmap = new HeightProvider(CONFIG.worldHeight);
         this.settings = settings;
 
         for(int i = 0; i < blocks.length; i++){
@@ -80,7 +77,6 @@ public class AtlasChunkGenerator extends ChunkGenerator {
         }
 
     }
-
 
 
 
@@ -97,12 +93,12 @@ public class AtlasChunkGenerator extends ChunkGenerator {
     }
 
 
-    private int getFromMap(int x, int z, @NotNull HeightProvider nmi) {
+    public int getFromMap(int x, int z) {
         float xR = (x / horizontalScale);
         float zR = (z / horizontalScale);
         //System.out.println("Zoom: " + zoom);
-        if (xR < 0 || zR < 0) return this.getMinimumY() - 1;
-        return nmi.getElevation(x,z) + CONFIG.startingY;
+        if (xR < 0 || zR < 0) return getMinimumY() - 1;
+        return getElevation(x,z) + CONFIG.startingY;
     }
 
     public RegistryEntry<ChunkGeneratorSettings> getSettings() {
@@ -267,7 +263,7 @@ public class AtlasChunkGenerator extends ChunkGenerator {
                                 int blockZ = chunkNoiseSampler.blockZ();
                                 mutable.set(blockX, blockY, blockZ);
                                 int seaLevel = this.getSeaLevel(blockX, blockZ);
-                                int elevation = this.getFromMap(blockX, blockZ, this.heightmap);
+                                int elevation = this.getFromMap(blockX, blockZ);
                                 //if (blockY >= seaLevel && blockY >= elevation || elevation < this.getMinimumY())
                                    // continue;
                                 int height = blockY - minY;
@@ -321,14 +317,14 @@ public class AtlasChunkGenerator extends ChunkGenerator {
 //                (heightmap == Heightmap.Type.OCEAN_FLOOR_WG || heightmap == Heightmap.Type.OCEAN_FLOOR)
 //                        ? this.getFromMap(x, z, this.heightmap) :
 //                Math.max(this.seaLevel,
-                this.getFromMap(x, z, this.heightmap)
+                this.getFromMap(x, z)
 //                )
         );
     }
 
     @Override
     public VerticalBlockSample getColumnSample(int x, int z, HeightLimitView world, NoiseConfig noiseConfig) {
-        int elevation = (int) this.getFromMap(x, z, this.heightmap);
+        int elevation = (int) this.getFromMap(x, z);
         int seaLevel = this.getSeaLevel(x, z);
         if (elevation < this.getMinimumY())
             return new VerticalBlockSample(world.getBottomY(), new BlockState[]{Blocks.AIR.getDefaultState()});
@@ -349,7 +345,7 @@ public class AtlasChunkGenerator extends ChunkGenerator {
 
     @Override
     public void getDebugHudText(List<String> text, NoiseConfig noiseConfig, BlockPos pos) {
-        text.add("[Atlas CG] elevation: " + this.getFromMap(pos.getX(), pos.getZ(), this.heightmap));
+        text.add("[Atlas CG] elevation: " + this.getFromMap(pos.getX(), pos.getZ()));
     }
 
     private ChunkNoiseSampler createChunkNoiseSampler(Chunk chunk, StructureAccessor world, Blender blender, NoiseConfig noiseConfig) {
