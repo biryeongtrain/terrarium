@@ -2,8 +2,7 @@ package com.miir.atlas.world.gen.chunk;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.miir.atlas.accessor.AMISurfaceBuilderAccessor;
-import com.miir.atlas.world.gen.HeightProvider;
-import com.miir.atlas.world.gen.surface.providers.Badlands;
+import com.miir.atlas.world.gen.SurfaceBlockProvider;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -41,24 +40,23 @@ import net.minecraft.world.gen.carver.CarvingMask;
 import net.minecraft.world.gen.carver.ConfiguredCarver;
 import net.minecraft.world.gen.chunk.*;
 import net.minecraft.world.gen.noise.NoiseConfig;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 import static com.miir.atlas.Atlas.CONFIG;
+import static com.miir.atlas.Atlas.seed;
 import static com.miir.atlas.world.gen.HeightProvider.getElevation;
-import static com.miir.atlas.world.gen.SurfaceBlockProvider.getBlock;
 
 public class AtlasChunkGenerator extends ChunkGenerator {
+
     private static final BlockState AIR = Blocks.AIR.getDefaultState();
     private final int seaLevel;
     private final int ceilingHeight;
     private final RegistryEntry<ChunkGeneratorSettings> settings;
     private final float horizontalScale;
-    private static BlockState[] blocks = new BlockState[64];
-    private static BlockState[] possible = {Blocks.TERRACOTTA.getDefaultState(), Blocks.RED_TERRACOTTA.getDefaultState(), Blocks.ORANGE_TERRACOTTA.getDefaultState(), Blocks.YELLOW_TERRACOTTA.getDefaultState(), Blocks.WHITE_TERRACOTTA.getDefaultState(), Blocks.BROWN_TERRACOTTA.getDefaultState()};
+    private static SurfaceBlockProvider provider;
     public AtlasChunkGenerator(
             BiomeSource biomeSource, RegistryEntry<ChunkGeneratorSettings> settings,
             int ceilingHeight
@@ -69,17 +67,15 @@ public class AtlasChunkGenerator extends ChunkGenerator {
         this.ceilingHeight = ceilingHeight;
         this.horizontalScale = 1;
 
-
         this.settings = settings;
 
-        for(int i = 0; i < blocks.length; i++){
-            blocks[i] = possible[(int) (Math.random() * possible.length)];
-        }
 
     }
 
 
-
+    public static void initSurfaceProvider(){
+        provider = new SurfaceBlockProvider(seed);
+    }
     private int getCeilingHeight() {
         return this.ceilingHeight;
     }
@@ -274,7 +270,7 @@ public class AtlasChunkGenerator extends ChunkGenerator {
                                     state = defaultFluid;
                                 }
                                 else if(blockY < elevation){
-                                    state = getBlock(blockX, blockZ, blockY);
+                                    state = provider.getBlock(blockX, blockZ, blockY, elevation);
                                 }
                                 else {
                                     state = AIR;

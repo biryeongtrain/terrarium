@@ -1,7 +1,4 @@
-package com.miir.atlas.world.gen.surface.providers;
-
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
+package com.miir.atlas.world.gen.surface.providers.badlands;
 
 public class BadlandsConfig{
     double tilt = 10.0;
@@ -20,6 +17,11 @@ public class BadlandsConfig{
             "GRAY_TERRACOTTA",
             "BLACK_TERRACOTTA",
             "WHITE_TERRACOTTA"
+    };
+    String[] surfaceFlat = new String[]{
+           "SAND",
+           "RED_SAND",
+           "COARSE_DIRT"
     };
     int bandWidthMax = 20;
     int bandWidthMin = 2;

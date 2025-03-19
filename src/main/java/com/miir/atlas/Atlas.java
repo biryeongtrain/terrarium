@@ -21,7 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static com.miir.atlas.world.gen.SurfaceBlockProvider.init;
+import static com.miir.atlas.world.gen.chunk.AtlasChunkGenerator.initSurfaceProvider;
 
 
 public class Atlas implements ModInitializer {
@@ -53,12 +53,11 @@ public class Atlas implements ModInitializer {
         // Register custom chunk generator
         Registry.register(Registries.CHUNK_GENERATOR, id(MOD_ID), AtlasChunkGenerator.CODEC);
 
-        SurfaceBlockProvider.register();
 
         ServerWorldEvents.LOAD.register((server, world) -> {
             // Get the world seed
             seed = world.getSeed();
-            init();
+            initSurfaceProvider();
             // Print the seed to the console (or use it as needed)
             //System.out.println("World Seed: " + seed);
         });

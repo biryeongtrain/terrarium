@@ -83,7 +83,7 @@ public class HeightProvider {
             Color rgb = new Color(cache.get(key).getRGB(xPixel, zPixel));
             double elevation = (rgb.getRed() * 256 + rgb.getGreen() + rgb.getBlue() / 256.0) - 32768;
             //System.out.println(elevation);
-            return (int) (((elevation / 8850) * CONFIG.worldHeight) * ((-CONFIG.altitudeDropoff * (elevation/8850)) + CONFIG.additionalAlt));
+            return (int) (((elevation / 8850) * CONFIG.worldHeight) * ((-1 * Math.pow(CONFIG.altitudeDropoff,(elevation/8850) - 1) + CONFIG.additionalAlt)));
         }
         return 64;
     }
