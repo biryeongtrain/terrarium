@@ -1,8 +1,6 @@
 package com.miir.atlas;
 
 
-import dev.codedsakura.blossom.lib.teleport.TeleportConfig;
-import org.jetbrains.annotations.Nullable;
 
 public class AtlasConfig {
     public double additionalAlt = 1.0;

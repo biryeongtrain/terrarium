@@ -83,7 +83,7 @@ public class HeightProvider {
             Color rgb = new Color(cache.get(key).getRGB(xPixel, zPixel));
             double elevation = (rgb.getRed() * 256 + rgb.getGreen() + rgb.getBlue() / 256.0) - 32768;
             //System.out.println(elevation);
-            return (int) (((elevation / 8850) * CONFIG.worldHeight) * ((-1 * Math.pow(CONFIG.altitudeDropoff,(elevation/8850) - 1) + CONFIG.additionalAlt)));
+            return (int) ((elevation / 8850) * CONFIG.worldHeight);
         }
         return 64;
     }
@@ -91,13 +91,11 @@ public class HeightProvider {
 
 
     public static int getElevation(int x, int z) {
-        int size = (int) (Math.pow(2, CONFIG.zoom) * 256);
+
         if(cache.size() > 128){
             cache.clear();
         }
-        if(x > size || z > size){
-            return 64;
-        }
+
         //System.out.println(getFromImageCache(x, z));
         return getFromImageCache(x,z);
     }

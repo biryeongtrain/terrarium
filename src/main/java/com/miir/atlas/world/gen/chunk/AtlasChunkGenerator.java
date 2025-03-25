@@ -285,7 +285,7 @@ public class AtlasChunkGenerator extends ChunkGenerator {
 
     @Override
     public int getHeight(int x, int z, Heightmap.Type heightmap, HeightLimitView world, NoiseConfig noiseConfig) {
-        return (int) (
+        return (
 //                (heightmap == Heightmap.Type.OCEAN_FLOOR_WG || heightmap == Heightmap.Type.OCEAN_FLOOR)
 //                        ? this.getFromMap(x, z, this.heightmap) :
 //                Math.max(this.seaLevel,
@@ -296,7 +296,7 @@ public class AtlasChunkGenerator extends ChunkGenerator {
 
     @Override
     public VerticalBlockSample getColumnSample(int x, int z, HeightLimitView world, NoiseConfig noiseConfig) {
-        int elevation = (int) this.getFromMap(x, z);
+        int elevation = this.getFromMap(x, z);
         int seaLevel = this.getSeaLevel(x, z);
         if (elevation < this.getMinimumY())
             return new VerticalBlockSample(world.getBottomY(), new BlockState[]{Blocks.AIR.getDefaultState()});
