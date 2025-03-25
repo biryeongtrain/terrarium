@@ -2,9 +2,6 @@ package com.miir.atlas.world.gen.chunk;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.miir.atlas.accessor.AMISurfaceBuilderAccessor;
-import com.miir.atlas.world.gen.HeightProvider;
-import com.miir.atlas.world.gen.surface.providers.Badlands;
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.SharedConstants;
@@ -41,7 +38,6 @@ import net.minecraft.world.gen.carver.CarvingMask;
 import net.minecraft.world.gen.carver.ConfiguredCarver;
 import net.minecraft.world.gen.chunk.*;
 import net.minecraft.world.gen.noise.NoiseConfig;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -49,47 +45,21 @@ import java.util.stream.Stream;
 
 import static com.miir.atlas.Atlas.CONFIG;
 import static com.miir.atlas.world.gen.HeightProvider.getElevation;
-import static com.miir.atlas.world.gen.SurfaceBlockProvider.getBlock;
 
 public class AtlasChunkGenerator extends ChunkGenerator {
     private static final BlockState AIR = Blocks.AIR.getDefaultState();
     private final int seaLevel;
-    private final int ceilingHeight;
     private final RegistryEntry<ChunkGeneratorSettings> settings;
     private final float horizontalScale;
-    private static BlockState[] blocks = new BlockState[64];
-    private static BlockState[] possible = {Blocks.TERRACOTTA.getDefaultState(), Blocks.RED_TERRACOTTA.getDefaultState(), Blocks.ORANGE_TERRACOTTA.getDefaultState(), Blocks.YELLOW_TERRACOTTA.getDefaultState(), Blocks.WHITE_TERRACOTTA.getDefaultState(), Blocks.BROWN_TERRACOTTA.getDefaultState()};
     public AtlasChunkGenerator(
-            BiomeSource biomeSource, RegistryEntry<ChunkGeneratorSettings> settings,
-            int ceilingHeight
+            BiomeSource biomeSource, RegistryEntry<ChunkGeneratorSettings> settings
     ) {
         super(biomeSource);
 
         this.seaLevel = settings.value().seaLevel();
-        this.ceilingHeight = ceilingHeight;
         this.horizontalScale = 1;
-
-
         this.settings = settings;
 
-        for(int i = 0; i < blocks.length; i++){
-            blocks[i] = possible[(int) (Math.random() * possible.length)];
-        }
-
-    }
-
-
-
-    private int getCeilingHeight() {
-        return this.ceilingHeight;
-    }
-
-    private int getScale() {
-        return CONFIG.worldHeight;
-    }
-
-    private int getStartingY() {
-        return CONFIG.startingY;
     }
 
 
@@ -113,10 +83,7 @@ public class AtlasChunkGenerator extends ChunkGenerator {
                             .forGetter(AtlasChunkGenerator::getBiomeSource),
                     ChunkGeneratorSettings.REGISTRY_CODEC
                             .fieldOf("settings")
-                            .forGetter(AtlasChunkGenerator::getSettings),
-                    Codec.INT
-                            .optionalFieldOf("ceiling_height", Integer.MIN_VALUE)
-                            .forGetter(AtlasChunkGenerator::getCeilingHeight)
+                            .forGetter(AtlasChunkGenerator::getSettings)
             ).apply(instance, instance.stable(AtlasChunkGenerator::new))
     );
 
@@ -221,15 +188,13 @@ public class AtlasChunkGenerator extends ChunkGenerator {
         ChunkPos chunkPos = chunk.getPos();
         int i = chunkPos.getStartX();
         int j = chunkPos.getStartZ();
-        AquiferSampler aquiferSampler = chunkNoiseSampler.getAquiferSampler();
         chunkNoiseSampler.sampleStartDensity();
         BlockPos.Mutable mutable = new BlockPos.Mutable();
-        int minY = settings.value().generationShapeConfig().minimumY();
         int k = chunkNoiseSampler.getHorizontalCellBlockCount();
         int l = chunkNoiseSampler.getVerticalCellBlockCount();
         int m = 16 / k;
         int n = 16 / k;
-        BlockState defaultBlock = this.settings.value().defaultBlock();
+
         BlockState defaultFluid = this.settings.value().defaultFluid();
         for (int o = 0; o < m; ++o) {
             chunkNoiseSampler.sampleEndDensity(o);
@@ -264,28 +229,34 @@ public class AtlasChunkGenerator extends ChunkGenerator {
                                 mutable.set(blockX, blockY, blockZ);
                                 int seaLevel = this.getSeaLevel(blockX, blockZ);
                                 int elevation = this.getFromMap(blockX, blockZ);
-                                //if (blockY >= seaLevel && blockY >= elevation || elevation < this.getMinimumY())
-                                   // continue;
-                                int height = blockY - minY;
-                                int maxHeight = elevation - minY;
-                                double cave;
-                                BlockState state;
-                                if(blockY <= seaLevel && blockY >= elevation){
-                                    state = defaultFluid;
-                                }
-                                else if(blockY < elevation){
-                                    state = getBlock(blockX, blockZ, blockY);
-                                }
-                                else {
-                                    state = AIR;
-                                }
-                                chunkSection.setBlockState(x, t, aa, state, false);
-                                oceanHeightmap.trackUpdate(x, s, aa, state);
-                                surfaceHeightmap.trackUpdate(x, s, aa, state);
 
-                                if (!aquiferSampler.needsFluidTick() || state.getFluidState().isEmpty()) continue;
-                                mutable.set(w, s, z);
+                                BlockState state;
+                                if (elevation - blockY <= 10) {
+                                    if (blockY <= seaLevel && blockY >= elevation) {
+                                        state = defaultFluid;
+                                    } else if (blockY < elevation) {
+                                        state = this.settings.value().defaultBlock(); //getBlock(blockX, blockZ, blockY);
+                                    } else {
+                                        state = AIR;
+                                    }
+                                    chunk.setBlockState(mutable, state, false);
+                                    surfaceHeightmap.trackUpdate(blockX & 0xF, blockY, blockZ & 0xF, state);
+                                    oceanHeightmap.trackUpdate(blockX & 0xF, blockY, blockZ & 0xF, state);
+                                } else {
+                                    state = chunkNoiseSampler.sampleBlockState();
+
+                                    state = this.settings.value().defaultBlock();
+
+                                    if ((SharedConstants.isOutsideGenerationArea(chunk.getPos())))
+                                        continue;
+                                    chunkSection.setBlockState(x, t, aa, state, false);
+                                    oceanHeightmap.trackUpdate(x, s, aa, state);
+                                    surfaceHeightmap.trackUpdate(x, s, aa, state);
+                                }
+                                mutable.set(w, s,z);
+                                //if (!aquiferSampler.needsFluidTick() || state.getFluidState().isEmpty()) continue;
                                 chunk.markBlockForPostProcessing(mutable);
+                                //buildSurface(chunk, new HeightContext(this, chunk.getHeightLimitView()),noiseConfig, accessor, null, accessor.getRegistryManager().get(), blender);
                             }
                         }
                     }
@@ -294,6 +265,7 @@ public class AtlasChunkGenerator extends ChunkGenerator {
             chunkNoiseSampler.swapBuffers();
         }
         chunkNoiseSampler.stopInterpolation();
+
         return chunk;
     }
 
@@ -349,22 +321,16 @@ public class AtlasChunkGenerator extends ChunkGenerator {
     }
 
     private ChunkNoiseSampler createChunkNoiseSampler(Chunk chunk, StructureAccessor world, Blender blender, NoiseConfig noiseConfig) {
-        return ChunkNoiseSampler.create(chunk, noiseConfig, StructureWeightSampler.createStructureWeightSampler(world, chunk.getPos()), this.settings.value(), this.createFluidLevelSampler(this.settings.value()), blender);
+        return ChunkNoiseSampler.create(
+                chunk,
+                noiseConfig,
+                StructureWeightSampler.createStructureWeightSampler(world, chunk.getPos()),
+                this.settings.value(),
+                (x, y, z) -> new AquiferSampler.FluidLevel(getSeaLevel(), settings.value().defaultFluid()),
+                blender
+        );
     }
 
-    private AquiferSampler.FluidLevelSampler createFluidLevelSampler(ChunkGeneratorSettings settings) {
-        AquiferSampler.FluidLevel fluidLevel = new AquiferSampler.FluidLevel(-54, Blocks.LAVA.getDefaultState());
-        int i = settings.seaLevel();
-        return (x, y, z) -> {
-            if (y < Math.min(-54, i)) {
-                return fluidLevel;
-            }
-//            else if (this.getFromMap(x, z, this.heightmap) < (this.aquifer == null ? this.seaLevel : this.getFromMap(x, z, this.aquifer))) {
-            return new AquiferSampler.FluidLevel(this.seaLevel, settings.defaultFluid());
-//            }
-//            return fluidLevel3;
-        };
-    }
 
 
 }

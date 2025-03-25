@@ -1,6 +1,7 @@
 package com.miir.atlas;
 
 
+import com.miir.atlas.world.gen.AtlasPredicates;
 import com.miir.atlas.world.gen.SurfaceBlockProvider;
 import com.miir.atlas.world.gen.chunk.AtlasChunkGenerator;
 
@@ -54,7 +55,7 @@ public class Atlas implements ModInitializer {
         Registry.register(Registries.CHUNK_GENERATOR, id(MOD_ID), AtlasChunkGenerator.CODEC);
 
         SurfaceBlockProvider.register();
-
+        AtlasPredicates.register();
         ServerWorldEvents.LOAD.register((server, world) -> {
             // Get the world seed
             seed = world.getSeed();

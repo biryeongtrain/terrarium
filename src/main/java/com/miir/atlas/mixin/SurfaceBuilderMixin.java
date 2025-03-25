@@ -62,7 +62,6 @@ public abstract class SurfaceBuilderMixin implements AMISurfaceBuilderAccessor {
             }
         };
         MaterialRules.MaterialRuleContext materialRuleContext = MaterialRuleContextAccessor.createMaterialRuleContext((((SurfaceBuilder) (Object) this)), noiseConfig, chunk, chunkNoiseSampler, biomeAccess::getBiome, biomeRegistry, heightContext);
-        //((HeightProviderAccessor)(Object) materialRuleContext).atlas_setAMI(ami);
         MaterialRules.BlockStateRule blockStateRule = materialRule.apply(materialRuleContext);
         BlockPos.Mutable mutable2 = new BlockPos.Mutable();
         for (int k = 0; k < 16; ++k) {
