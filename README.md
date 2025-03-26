@@ -1,9 +1,9 @@
-# Atlas-Geo
-Earth in minecraft, built off atlas because I hate java.
+# Terrarium
+Earth in minecraft.
 
 - Does it modify world height like CubicChunks? NO
-- Is it configurable? Not yet
-- Is it working? yes if you enjoy beautiful stony landscape!
+- Is it configurable? A bit
+- Is it working? yes if you like random biomes
 
 it uses aws for data
 

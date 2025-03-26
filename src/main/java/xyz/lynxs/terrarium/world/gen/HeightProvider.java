@@ -1,7 +1,7 @@
-package com.miir.atlas.world.gen;
+package xyz.lynxs.terrarium.world.gen;
 
 
-import com.miir.atlas.Atlas;
+import xyz.lynxs.terrarium.Terrarium;
 import org.slf4j.Logger;
 
 import javax.imageio.ImageIO;
@@ -17,18 +17,22 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.miir.atlas.Atlas.CONFIG;
+import static xyz.lynxs.terrarium.Terrarium.CONFIG;
 
 
 public class HeightProvider {
     private static final String CACHE_DIR = "./world/tiles/";
     private static final String TILE_URL = "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/";
-    private static final Logger LOGGER = Atlas.LOGGER;
-
+    private static final Logger LOGGER = Terrarium.LOGGER;
+    public static int offset = (int) (256 * Math.pow(2, CONFIG.zoom))/5;
+    public static int size = (int) (256 * Math.pow(2, CONFIG.zoom));
     private static Map<Long, BufferedImage> cache = new ConcurrentHashMap<>();
 
 
-
+    public static void init(){
+        offset = (int) (256 * Math.pow(2, CONFIG.zoom))/5;
+        size = (int) (256 * Math.pow(2, CONFIG.zoom));
+    }
     @Deprecated
     private static void getElevationFromHeightmap(int xTile, int zTile) {
 
@@ -97,7 +101,7 @@ public class HeightProvider {
         }
 
         //System.out.println(getFromImageCache(x, z));
-        return getFromImageCache(x,z);
+        return getFromImageCache(x + offset, z + offset);
     }
 
     public static long pack(int x, int z) {

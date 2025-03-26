@@ -1,7 +1,7 @@
-package com.miir.atlas.world.gen.chunk;
+package xyz.lynxs.terrarium.world.gen.chunk;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.miir.atlas.accessor.AMISurfaceBuilderAccessor;
+import xyz.lynxs.terrarium.accessor.TerrariumSurfaceBuilderAccessor;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.SharedConstants;
@@ -43,15 +43,15 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
-import static com.miir.atlas.Atlas.CONFIG;
-import static com.miir.atlas.world.gen.HeightProvider.getElevation;
+import static xyz.lynxs.terrarium.Terrarium.CONFIG;
+import static xyz.lynxs.terrarium.world.gen.HeightProvider.*;
 
-public class AtlasChunkGenerator extends ChunkGenerator {
+public class TerrariumChunkGenerator extends ChunkGenerator {
     private static final BlockState AIR = Blocks.AIR.getDefaultState();
     private final int seaLevel;
     private final RegistryEntry<ChunkGeneratorSettings> settings;
     private final float horizontalScale;
-    public AtlasChunkGenerator(
+    public TerrariumChunkGenerator(
             BiomeSource biomeSource, RegistryEntry<ChunkGeneratorSettings> settings
     ) {
         super(biomeSource);
@@ -64,11 +64,10 @@ public class AtlasChunkGenerator extends ChunkGenerator {
 
 
     public int getFromMap(int x, int z) {
-        float xR = (x / horizontalScale);
-        float zR = (z / horizontalScale);
         //System.out.println("Zoom: " + zoom);
-        if (xR < 0 || zR < 0) return getMinimumY() - 1;
-        return getElevation(x,z) + CONFIG.startingY;
+        if (x < -offset || z < -offset || x  > size - offset|| z > size - offset)
+            return getMinimumY() - 1;
+        return getElevation(x, z) + CONFIG.startingY;
     }
 
     public RegistryEntry<ChunkGeneratorSettings> getSettings() {
@@ -76,15 +75,15 @@ public class AtlasChunkGenerator extends ChunkGenerator {
     }
 
 
-    public static final MapCodec<AtlasChunkGenerator> CODEC = RecordCodecBuilder.mapCodec(
+    public static final MapCodec<TerrariumChunkGenerator> CODEC = RecordCodecBuilder.mapCodec(
             instance -> instance.group(
                     BiomeSource.CODEC
                             .fieldOf("biome_source")
-                            .forGetter(AtlasChunkGenerator::getBiomeSource),
+                            .forGetter(TerrariumChunkGenerator::getBiomeSource),
                     ChunkGeneratorSettings.REGISTRY_CODEC
                             .fieldOf("settings")
-                            .forGetter(AtlasChunkGenerator::getSettings)
-            ).apply(instance, instance.stable(AtlasChunkGenerator::new))
+                            .forGetter(TerrariumChunkGenerator::getSettings)
+            ).apply(instance, instance.stable(TerrariumChunkGenerator::new))
     );
 
 
@@ -144,7 +143,7 @@ public class AtlasChunkGenerator extends ChunkGenerator {
     public void buildSurface(Chunk chunk, HeightContext heightContext, NoiseConfig noiseConfig, StructureAccessor structureAccessor, BiomeAccess biomeAccess, Registry<Biome> biomeRegistry, Blender blender) {
         ChunkNoiseSampler chunkNoiseSampler = chunk.getOrCreateChunkNoiseSampler(chunk3 -> this.createChunkNoiseSampler(chunk3, structureAccessor, blender, noiseConfig));
         ChunkGeneratorSettings chunkGeneratorSettings = this.settings.value();
-        ((AMISurfaceBuilderAccessor) noiseConfig.getSurfaceBuilder()).buildSurface(noiseConfig, biomeAccess, biomeRegistry, chunkGeneratorSettings.usesLegacyRandom(), heightContext, chunk, chunkNoiseSampler, chunkGeneratorSettings.surfaceRule());
+        ((TerrariumSurfaceBuilderAccessor) noiseConfig.getSurfaceBuilder()).buildSurface(noiseConfig, biomeAccess, biomeRegistry, chunkGeneratorSettings.usesLegacyRandom(), heightContext, chunk, chunkNoiseSampler, chunkGeneratorSettings.surfaceRule());
     }
 
     @Override
@@ -330,7 +329,5 @@ public class AtlasChunkGenerator extends ChunkGenerator {
                 blender
         );
     }
-
-
 
 }

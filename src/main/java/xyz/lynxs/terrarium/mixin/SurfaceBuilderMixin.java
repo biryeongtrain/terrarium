@@ -1,6 +1,6 @@
-package com.miir.atlas.mixin;
+package xyz.lynxs.terrarium.mixin;
 
-import com.miir.atlas.accessor.AMISurfaceBuilderAccessor;
+import xyz.lynxs.terrarium.accessor.TerrariumSurfaceBuilderAccessor;
 import net.minecraft.block.BlockState;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -24,7 +24,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(SurfaceBuilder.class)
-public abstract class SurfaceBuilderMixin implements AMISurfaceBuilderAccessor {
+public abstract class SurfaceBuilderMixin implements TerrariumSurfaceBuilderAccessor {
     @Shadow protected abstract void placeBadlandsPillar(BlockColumn column, int x, int z, int surfaceY, HeightLimitView chunk);
 
     @Shadow protected abstract boolean isDefaultBlock(BlockState state);

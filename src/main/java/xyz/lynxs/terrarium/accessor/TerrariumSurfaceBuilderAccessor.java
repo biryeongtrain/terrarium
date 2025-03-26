@@ -1,4 +1,4 @@
-package com.miir.atlas.accessor;
+package xyz.lynxs.terrarium.accessor;
 
 import net.minecraft.registry.Registry;
 import net.minecraft.world.biome.Biome;
@@ -9,7 +9,7 @@ import net.minecraft.world.gen.chunk.ChunkNoiseSampler;
 import net.minecraft.world.gen.noise.NoiseConfig;
 import net.minecraft.world.gen.surfacebuilder.MaterialRules;
 
-public interface AMISurfaceBuilderAccessor {
+public interface TerrariumSurfaceBuilderAccessor {
     void buildSurface(NoiseConfig noiseConfig, BiomeAccess biomeAccess, Registry<Biome> biomeRegistry, boolean useLegacyRandom, HeightContext heightContext, final Chunk chunk, ChunkNoiseSampler chunkNoiseSampler, MaterialRules.MaterialRule materialRule);
 
 }

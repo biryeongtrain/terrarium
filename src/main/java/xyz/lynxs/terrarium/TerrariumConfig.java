@@ -1,8 +1,8 @@
-package com.miir.atlas;
+package xyz.lynxs.terrarium;
 
 
 
-public class AtlasConfig {
+public class TerrariumConfig {
     public double additionalAlt = 1.0;
     public int zoom = 11;
     public int worldHeight = 512;

@@ -1,32 +1,29 @@
 {
     "schemaVersion": 1,
-    "id": "atlas",
+    "id": "terrarium",
     "version": "${version}",
-    "name": "Atlas",
-    "description": "an image-based world generator",
+    "name": "Terrarium",
+    "description": "Earth data-based world generator",
     "authors": [
-        "miir",
-        "acikek"
+        "ly-nxs"
     ],
     "contributors": [
-        "TheDeathlyCow"
+        "miir"
     ],
     "contact": {
-        "homepage": "https://github.com/itsmiir/",
-        "sources": "https://github.com/itsmiir/atlas",
-        "issues": "https://github.com/itsmiir/atlas/issues"
+        "homepage": "https://inv.lynxs.xyz"
     },
-    "license": "CC0-1.0",
-    "icon": "assets/atlas/icon.png",
+    "license": "CC BY-NC-SA",
+    "icon": "assets/terrarium/icon.png",
     "environment": "*",
     "entrypoints": {
         "main": [
-            "com.miir.atlas.Atlas"
+            "xyz.lynxs.terrarium.Terrarium"
         ]
     },
     "mixins": [
-        "atlas.mixins.json"
-    ],
+        "terrarium.mixins.json"
+      ],
     "depends": {
         "fabricloader": ">=0.16.2",
         "fabric-api": "*",
@@ -34,7 +31,7 @@
         "java": ">=21"
     },
     "suggests": {
-        "another-mod": "*"
+        "another-mod": "William Wyther's Overhauled Overworld"
     },
-    "accessWidener": "atlas.accesswidener"
+    "accessWidener": "terrarium.accesswidener"
 }

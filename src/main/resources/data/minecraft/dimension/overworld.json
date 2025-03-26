@@ -1,7 +1,7 @@
 {
   "type": "minecraft:overworld",
   "generator": {
-    "type": "atlas:atlas",
+    "type": "terrarium:terrarium",
     "biome_source": {
       "type": "minecraft:multi_noise",
       "preset": "minecraft:overworld"

@@ -1,6 +1,6 @@
-package com.miir.atlas.mixin;
+package xyz.lynxs.terrarium.mixin;
 
-import com.miir.atlas.world.gen.chunk.AtlasChunkGenerator;
+
 import com.mojang.datafixers.DataFixer;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.WorldGenerationProgressListener;
@@ -21,6 +21,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import xyz.lynxs.terrarium.world.gen.chunk.TerrariumChunkGenerator;
 
 import java.util.concurrent.Executor;
 import java.util.function.Supplier;
@@ -58,9 +59,9 @@ public class ThreadedAnvilChunkStorageMixin {
             boolean dsync,
             CallbackInfo ci
     ) {
-        if (chunkGenerator instanceof AtlasChunkGenerator atlasChunkGenerator) {
+        if (chunkGenerator instanceof TerrariumChunkGenerator terrariumChunkGenerator) {
             this.noiseConfig = NoiseConfig.create(
-                    atlasChunkGenerator.getSettings().value(),
+                    terrariumChunkGenerator.getSettings().value(),
                     world.getRegistryManager().getWrapperOrThrow(RegistryKeys.NOISE_PARAMETERS),
                     world.getSeed()
             );

@@ -1,4 +1,4 @@
-package com.miir.atlas.mixin;
+package xyz.lynxs.terrarium.mixin;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.registry.Registry;

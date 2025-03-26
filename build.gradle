@@ -4,7 +4,7 @@ plugins {
 }
 
 loom {
-	accessWidenerPath = file("src/main/resources/atlas.accesswidener")
+	accessWidenerPath = file("src/main/resources/terrarium.accesswidener")
 }
 
 sourceCompatibility = JavaVersion.VERSION_21
@@ -62,7 +62,7 @@ java {
 
 jar {
 	from("LICENSE") {
-		rename { "${it}_${project.archivesBaseName}"}
+		rename { "${it}_${archiveBaseName}"}
 	}
 }
 

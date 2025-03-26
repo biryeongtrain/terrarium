@@ -20,12 +20,12 @@ simply paste and tweak if you want. let's look at that file now:
 {
   "type": "minecraft:overworld",
   "generator": {
-    "type": "atlas:atlas",
+    "type": "terrarium:terrarium",
     "map_info": "avila:avila",
     "biome_source": {
-      "type": "atlas:atlas",
+      "type": "terrarium:terrarium",
       "map_info": "avila:avila",
-      "biome_map": "avila:atlas/map/biomes",
+      "biome_map": "avila:terrarium/map/biomes",
       "default": "minecraft:the_void",
       "biomes": [
         {
@@ -50,7 +50,7 @@ simply paste and tweak if you want. let's look at that file now:
       ],
       "below_depth": 10
     },
-    "settings": "atlas:default"
+    "settings": "terrarium:default"
   }
 }
 ```
@@ -117,7 +117,7 @@ the `map_info` json file looks like this:
 `/data/avila/worldgen/atlas_map_info/avila.json`
 ```json5
 {
-  "height_map": "avila:atlas/map/heightmap",
+  "height_map": "avila:terrarium/map/heightmap",
   "starting_y": 6,
   "horizontal_scale": 1,
   "vertical_scale": 1
@@ -153,7 +153,7 @@ use an aquifer, add an `aquifer` field to your chunk generator and specify a pat
 ```json5
 {
   "generator": {
-    "type": "atlas:atlas",
+    "type": "terrarium:terrarium",
     "aquifer": "my_datapack:path/to/PNGfile"
   }
 }

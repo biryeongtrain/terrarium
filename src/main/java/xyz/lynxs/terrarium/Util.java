@@ -1,4 +1,4 @@
-package com.miir.atlas;
+package xyz.lynxs.terrarium;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;

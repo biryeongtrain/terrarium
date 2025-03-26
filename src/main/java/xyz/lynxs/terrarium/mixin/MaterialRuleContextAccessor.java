@@ -1,4 +1,4 @@
-package com.miir.atlas.mixin;
+package xyz.lynxs.terrarium.mixin;
 
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.entry.RegistryEntry;
