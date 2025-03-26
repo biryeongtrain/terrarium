@@ -1,9 +1,9 @@
 name: Release
 
 on:
-  release:
-    types:
-      - published
+ pull_request:
+ push:
+  paths-ignore: [ '.github/', 'docs/', 'mkdocs.yml' ]
 
 jobs:
   build:
