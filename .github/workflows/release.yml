@@ -32,8 +32,6 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
         env:
-          MODRINTH: ${{ secrets.MODRINTH }}
-          CURSEFORGE: ${{ secrets.CURSEFORGE }}
           CHANGELOG: ${{ github.event.release.body }}
 
       - name: Upload GitHub release
