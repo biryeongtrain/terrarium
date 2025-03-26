@@ -65,8 +65,8 @@ public class TerrariumChunkGenerator extends ChunkGenerator {
 
     public int getFromMap(int x, int z) {
         //System.out.println("Zoom: " + zoom);
-        if (x < -offset || z < -offset || x  > size - offset|| z > size - offset)
-            return getMinimumY() - 1;
+        //if (x < -offset || z < -offset || x  > size - offset|| z > size - offset)
+         //   return getMinimumY() - 1;
         return getElevation(x, z) + CONFIG.startingY;
     }
 
