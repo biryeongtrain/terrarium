@@ -5,7 +5,7 @@ Generate 1:1 block-scale worlds from real elevation data, with dynamic tile load
 
 ---
 
-## 🌐 **Terrain Data Pipeline**  
+## 🌐 Terrain Data Pipeline
 - **Source**: AWS S3 (`elevation-tiles-prod/terrarium/{z}/{x}/{y}.png`)  
 - **Pixel-to-Block**: 1 pixel = 1 Minecraft block.  
 - **Tile System**:  
@@ -15,10 +15,15 @@ Generate 1:1 block-scale worlds from real elevation data, with dynamic tile load
 
 ---
 
+## 🗃️ Downloads
+- While it is still at Alpha quality, you can download indev test versions [here](https://nightly.link/ly-nxs/terrarium/workflows/build/1.21-World/Artifacts)
+- Support is not guarunteed
+---
+
 ## 🏔️ Technical Notes
 - **Scale Examples**:
-  -zoom: 10 = 1,024 tiles → 262,144×262,144 blocks.
-  -zoom: 13 = 8,192 tiles → 2,097,152×2,097,152 blocks.
+  - zoom: 10 = 1,024 tiles → 262,144×262,144 blocks.
+  - zoom: 13 = 8,192 tiles → 2,097,152×2,097,152 blocks.
 
 ### 🌩️ Performance:
 - Higher zoom = larger worlds but slower generation.
