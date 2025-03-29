@@ -101,7 +101,7 @@ public class HeightProvider {
         }
 
         //System.out.println(getFromImageCache(x, z));
-        return getFromImageCache(x + offset, z + offset);
+        return getFromImageCache(x, z);
     }
 
     public static long pack(int x, int z) {
