@@ -319,7 +319,7 @@ public class TerrariumChunkGenerator extends ChunkGenerator {
 
     @Override
     public void getDebugHudText(List<String> text, NoiseConfig noiseConfig, BlockPos pos) {
-        text.add("[Atlas CG] elevation: " + this.getFromMap(pos.getX(), pos.getZ()));
+        text.add("[Atlas CG] elevation: " + getElevation(pos.getX(), pos.getZ()));
     }
 
     private ChunkNoiseSampler createChunkNoiseSampler(Chunk chunk, StructureAccessor world, Blender blender, NoiseConfig noiseConfig) {
