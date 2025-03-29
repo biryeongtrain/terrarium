@@ -29,7 +29,7 @@ Generate 1:1 block-scale worlds from real elevation data, with dynamic tile load
 - Higher zoom = larger worlds but slower generation.
 - Reduce zoom to 8–10 for survival-friendly sizes.
 ### World Size Comparison
-- zoom: 10 (small) vs. zoom: 13 (planetary-scale - ~1:1).
+- zoom: 10 (small - ~1:48) vs. zoom: 13 (planetary-scale - ~1:6).
 ### 🖼️ Screenshots:
 
 **Zoom: 11 | Height 512**
