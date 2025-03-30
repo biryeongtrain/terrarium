@@ -38,7 +38,6 @@ import net.minecraft.world.gen.carver.CarvingMask;
 import net.minecraft.world.gen.carver.ConfiguredCarver;
 import net.minecraft.world.gen.chunk.*;
 import net.minecraft.world.gen.noise.NoiseConfig;
-import xyz.lynxs.terrarium.world.gen.HeightProviderCache;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -46,7 +45,6 @@ import java.util.stream.Stream;
 
 import static xyz.lynxs.terrarium.Terrarium.CONFIG;
 import static xyz.lynxs.terrarium.world.gen.HeightProvider.*;
-import static xyz.lynxs.terrarium.world.gen.HeightProviderCache.clearCache;
 
 public class TerrariumChunkGenerator extends ChunkGenerator {
     private static final BlockState AIR = Blocks.AIR.getDefaultState();
@@ -69,7 +67,7 @@ public class TerrariumChunkGenerator extends ChunkGenerator {
         //System.out.println("Zoom: " + zoom);
         if (x < 0 || z < 0 || x  > size || z > size)
             return getMinimumY() - 1;
-        return HeightProviderCache.getHeight(x, z) + CONFIG.startingY;
+        return getElevation(x, z) + CONFIG.startingY;
     }
 
     public RegistryEntry<ChunkGeneratorSettings> getSettings() {
@@ -164,7 +162,6 @@ public class TerrariumChunkGenerator extends ChunkGenerator {
 
     @Override
     public CompletableFuture<Chunk> populateNoise(Blender blender, NoiseConfig noiseConfig, StructureAccessor structureAccessor, Chunk chunk) {
-        clearCache();
         GenerationShapeConfig generationShapeConfig = this.settings.value().generationShapeConfig().trimHeight(chunk.getHeightLimitView());
         int k = MathHelper.floorDiv(generationShapeConfig.height(), generationShapeConfig.verticalSize());
         if (k <= 0) {

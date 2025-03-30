@@ -14,6 +14,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -26,15 +27,15 @@ public class HeightProvider {
     private static final Logger LOGGER = Terrarium.LOGGER;
     public static int offset = (int) (256 * Math.pow(2, CONFIG.zoom))/5;
     public static int size = (int) (256 * Math.pow(2, CONFIG.zoom));
-    private static Map<Long, BufferedImage> cache = new ConcurrentHashMap<>();
-
+    private static Map<Long, int[][]> cache = new ConcurrentHashMap<>();
 
     public static void init(){
         offset = (int) (256 * Math.pow(2, CONFIG.zoom))/5;
         size = (int) (256 * Math.pow(2, CONFIG.zoom));
     }
+
     @Deprecated
-    private static void getElevationFromHeightmap(int xTile, int zTile) {
+    private static void getElevationFromHeightmap(long key, int xTile, int zTile) {
 
 
         String cachePath = CACHE_DIR + CONFIG.zoom + "/" + xTile + "/" + zTile + ".png";
@@ -44,7 +45,7 @@ public class HeightProvider {
         File cacheFile = new File(cachePath);
         if (cacheFile.exists()) {
             try {
-                cache.put(pack(xTile, zTile), ImageIO.read(cacheFile));
+                cache.put(key, toIntHeightmap(ImageIO.read(cacheFile)));
 
             } catch (Exception e) {
                 LOGGER.error("Failed to load tile from cache: {}", e.getMessage());
@@ -65,7 +66,7 @@ public class HeightProvider {
                     }
                     ImageIO.write(tileImage, "png", cacheFile);
 
-                    cache.put(pack(xTile, zTile), tileImage);
+                    cache.put(key, toIntHeightmap(tileImage));
                 }
             } catch (IOException e) {
                 LOGGER.error("Failed to download tile: {}", e.getMessage());
@@ -73,45 +74,37 @@ public class HeightProvider {
             }
         }
     }
-    private static int getFromImageCache(int x, int z){
+    private static int[][] toIntHeightmap(BufferedImage image){
+        int[][] arr = new int[image.getWidth()][image.getHeight()];
+        for(int i = 0; i < image.getWidth(); i++){
+            for(int j = 0; j < image.getHeight(); j++){
+
+                Color rgb = new Color(image.getRGB(i, j));
+                double elevation = (rgb.getRed() * 256 + rgb.getGreen() + rgb.getBlue() / 256.0) - 32768;
+                //System.out.println(elevation);
+                arr[i][j] = (int) ((elevation / 8850) * CONFIG.worldHeight);
+
+            }
+        }
+        return arr;
+    }
+
+
+    public static int getElevation(int x, int z) {
         int xTile = x / 256;
         int zTile = z / 256;
         int xPixel = x - (xTile * 256);
         int zPixel = z - (zTile * 256);
         long key = pack(xTile,zTile);
-
-        if(!cache.containsKey(key)){
-            getElevationFromHeightmap(xTile, zTile);
-        }
-        if(cache.containsKey(key)) {
-            Color rgb = new Color(cache.get(key).getRGB(xPixel, zPixel));
-            double elevation = (rgb.getRed() * 256 + rgb.getGreen() + rgb.getBlue() / 256.0) - 32768;
-            //System.out.println(elevation);
-            return (int) ((elevation / 8850) * CONFIG.worldHeight);
-        }
-        return 64;
-    }
-
-
-
-    public static int getElevation(int x, int z) {
-
-        if(cache.size() > 128){
+        if(cache.size() > 64)
             cache.clear();
+        if (!cache.containsKey(key)) {
+            getElevationFromHeightmap(key, xTile, zTile);
         }
-
-        //System.out.println(getFromImageCache(x, z));
-        return getFromImageCache(x, z);
+        return cache.get(key)[xPixel][zPixel];
     }
 
     public static long pack(int x, int z) {
         return ((long) x & 0xFFFFFFFFL) | ((long) z & 0xFFFFFFFFL) << 32;
-    }
-    public static int unpackX(long packed) {
-        return (int) (packed >>> 32 & 0xFFFFFFFFL);
-    }
-
-    public static int unpackZ(long packed) {
-        return (int) (packed & 0xFFFFFFFFL);
     }
 }
