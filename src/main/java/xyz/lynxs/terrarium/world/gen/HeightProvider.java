@@ -103,6 +103,28 @@ public class HeightProvider {
         }
         return cache.get(key)[xPixel][zPixel];
     }
+    public static int getSectionSteepness(int x, int z, int radius) {
+        // Calculate bounds of the area to check
+        int minX = Math.max(x - radius, 0);
+        int maxX = x + radius;
+        int minZ = Math.max(z - radius, 0);
+        int maxZ = z + radius;
+
+        int minHeight = Integer.MAX_VALUE;
+        int maxHeight = Integer.MIN_VALUE;
+
+        // Iterate through all positions in the square area
+        for (int currentX = minX; currentX <= maxX; currentX++) {
+            for (int currentZ = minZ; currentZ <= maxZ; currentZ++) {
+                int elevation = getElevation(currentX, currentZ);
+                if (elevation < minHeight) minHeight = elevation;
+                if (elevation > maxHeight) maxHeight = elevation;
+            }
+        }
+
+        // Return the difference (steepness)
+        return maxHeight - minHeight;
+    }
 
     public static long pack(int x, int z) {
         return ((long) x & 0xFFFFFFFFL) | ((long) z & 0xFFFFFFFFL) << 32;

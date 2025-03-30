@@ -2,6 +2,7 @@ package xyz.lynxs.terrarium;
 
 
 import xyz.lynxs.terrarium.world.gen.TerrariumRegistries;
+import xyz.lynxs.terrarium.world.gen.biome.TerrariumBiomeSource;
 import xyz.lynxs.terrarium.world.gen.chunk.TerrariumChunkGenerator;
 
 import dev.codedsakura.blossom.lib.config.ConfigManager;
@@ -32,7 +33,18 @@ public class Terrarium implements ModInitializer {
         //register surface rules
         TerrariumRegistries.register();
         // Register custom chunk generator
-        Registry.register(Registries.CHUNK_GENERATOR, id(MOD_ID), TerrariumChunkGenerator.CODEC);
+        Registry.register(
+                Registries.BIOME_SOURCE,
+                id("biome_source"),
+                TerrariumBiomeSource.CODEC
+        );
+
+        // Register chunk generator
+        Registry.register(
+                Registries.CHUNK_GENERATOR,
+                id("chunk_generator"),
+                TerrariumChunkGenerator.CODEC
+        );
 
         init();
     }

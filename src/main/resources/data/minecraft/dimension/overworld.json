@@ -1,10 +1,29 @@
 {
   "type": "minecraft:overworld",
   "generator": {
-    "type": "terrarium:terrarium",
+    "type": "terrarium:chunk_generator",
     "biome_source": {
-      "type": "minecraft:multi_noise",
-      "preset": "minecraft:overworld"
+      "type": "terrarium:biome_source",
+      "biomes": [
+        {
+          "biome": "minecraft:plains",
+          "steepness": 5.0,
+          "temperature": 0.7,
+          "noise_weight": 1.0
+        },
+        {
+          "biome": "minecraft:badlands",
+          "steepness": 60.0,
+          "temperature": 0.2,
+          "noise_weight": 0.5
+        },
+        {
+          "biome": "minecraft:swamp",
+          "steepness": 10.0,
+          "temperature": 0.5,
+          "noise_weight": 0.8
+        }
+      ]
     },
     "settings": "minecraft:overworld"
   }

@@ -25,7 +25,6 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.GenerationSettings;
 import net.minecraft.world.biome.source.BiomeAccess;
 import net.minecraft.world.biome.source.BiomeCoords;
-import net.minecraft.world.biome.source.BiomeSource;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.ProtoChunk;
@@ -38,6 +37,7 @@ import net.minecraft.world.gen.carver.CarvingMask;
 import net.minecraft.world.gen.carver.ConfiguredCarver;
 import net.minecraft.world.gen.chunk.*;
 import net.minecraft.world.gen.noise.NoiseConfig;
+import xyz.lynxs.terrarium.world.gen.biome.TerrariumBiomeSource;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -48,18 +48,19 @@ import static xyz.lynxs.terrarium.world.gen.HeightProvider.*;
 
 public class TerrariumChunkGenerator extends ChunkGenerator {
     private static final BlockState AIR = Blocks.AIR.getDefaultState();
-    private final int seaLevel;
+
     private final RegistryEntry<ChunkGeneratorSettings> settings;
-    private final float horizontalScale;
+
+    private final TerrariumBiomeSource biomeSource;
+
     public TerrariumChunkGenerator(
-            BiomeSource biomeSource, RegistryEntry<ChunkGeneratorSettings> settings
+            TerrariumBiomeSource biomeSource, // Use custom type instead of generic BiomeSource
+            RegistryEntry<ChunkGeneratorSettings> settings
     ) {
-        super(biomeSource);
+        super(biomeSource); // Pass to parent
 
-        this.seaLevel = settings.value().seaLevel();
-        this.horizontalScale = 1;
+        this.biomeSource = biomeSource; // Store reference
         this.settings = settings;
-
     }
 
 
@@ -77,17 +78,18 @@ public class TerrariumChunkGenerator extends ChunkGenerator {
 
     public static final MapCodec<TerrariumChunkGenerator> CODEC = RecordCodecBuilder.mapCodec(
             instance -> instance.group(
-                    BiomeSource.CODEC
+                    TerrariumBiomeSource.CODEC // Use your biome source's CODEC
                             .fieldOf("biome_source")
                             .forGetter(TerrariumChunkGenerator::getBiomeSource),
                     ChunkGeneratorSettings.REGISTRY_CODEC
                             .fieldOf("settings")
                             .forGetter(TerrariumChunkGenerator::getSettings)
-            ).apply(instance, instance.stable(TerrariumChunkGenerator::new))
+            ).apply(instance, TerrariumChunkGenerator::new)
     );
 
-
-
+    public TerrariumBiomeSource getBiomeSource() {
+        return this.biomeSource;
+    }
 
     /**
      */
@@ -169,14 +171,11 @@ public class TerrariumChunkGenerator extends ChunkGenerator {
         }
         int x = chunk.getPos().x << 4;
         int z = chunk.getPos().z << 4;
-        float xR = (x / horizontalScale);
-        float zR = (z / horizontalScale);
 
-        int truncatedX = (int) Math.floor(xR);
-        int truncatedZ = (int) Math.floor(zR);
+
         int minimumCellY = MathHelper.floorDiv(generationShapeConfig.minimumY(), generationShapeConfig.verticalCellBlockCount());
         int cellHeight = MathHelper.floorDiv(generationShapeConfig.height(), generationShapeConfig.verticalCellBlockCount());
-        if (truncatedX < -16 || truncatedZ < -16) return CompletableFuture.completedFuture(chunk);
+        if (x < -16 || z < -16) return CompletableFuture.completedFuture(chunk);
         return CompletableFuture.supplyAsync(Util.debugSupplier("wgen_fill_noise", () -> this.populateNoise(chunk, structureAccessor, blender, noiseConfig, minimumCellY, cellHeight)), Util.getMainWorkerExecutor());
     }
 
@@ -270,11 +269,11 @@ public class TerrariumChunkGenerator extends ChunkGenerator {
 
     @Override
     public int getSeaLevel() {
-        return this.seaLevel;
+        return this.settings.value().seaLevel();
     }
 
     public int getSeaLevel(int x, int z) {
-        return seaLevel;
+        return this.settings.value().seaLevel();
     }
 
     @Override
