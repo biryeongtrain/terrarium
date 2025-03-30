@@ -33,7 +33,7 @@ Generate 1:1 block-scale worlds from real elevation data, with dynamic tile load
 ### World Size Comparison
 - zoom: 10 (small - ~1:48) vs. zoom: 13 (planetary-scale - ~1:6).
 ### 🖼️ Screenshots:
-
+- Taken with v0.0.1-alpha.4
 **Zoom: 11 | Height 512**
 
 ---
