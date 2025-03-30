@@ -18,6 +18,7 @@ Generate 1:1 block-scale worlds from real elevation data, with dynamic tile load
 ## 🗃️ Downloads
 - While it is still at Alpha quality, you can download indev test versions [here](https://nightly.link/ly-nxs/terrarium/workflows/build/1.21-World/Artifacts)
 - Support is not guarunteed
+- BlossomLib is required, and FabricAPI
 ---
 
 ## 🏔️ Technical Notes
