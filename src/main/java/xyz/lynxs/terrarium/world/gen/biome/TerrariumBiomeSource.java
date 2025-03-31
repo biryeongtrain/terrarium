@@ -4,53 +4,58 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.noise.PerlinNoiseSampler;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.source.BiomeCoords;
 import net.minecraft.world.biome.source.BiomeSource;
 import net.minecraft.world.biome.source.util.MultiNoiseUtil;
+import net.minecraft.world.gen.chunk.ChunkGeneratorSettings;
 
-import java.util.Arrays;
+
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
-import static xyz.lynxs.terrarium.world.gen.HeightProvider.getSectionSteepness;
-import static xyz.lynxs.terrarium.world.gen.HeightProvider.pack;
+import static xyz.lynxs.terrarium.Terrarium.CONFIG;
+import static xyz.lynxs.terrarium.world.gen.HeightProvider.*;
 
 public class TerrariumBiomeSource extends BiomeSource {
     private final List<BiomeEntry> biomeEntries;
     private final PerlinNoiseSampler noiseSampler;
-    private static final int radius = 16;
-    private static final int MAX_CACHE_SIZE = 1000;
-    private static final Map<Long, int[][]> cache = new ConcurrentHashMap<>();
+    private final RegistryEntry<ChunkGeneratorSettings> settings;
+
 
     public static final MapCodec<TerrariumBiomeSource> CODEC = RecordCodecBuilder.mapCodec(instance ->
             instance.group(
-                    BiomeEntry.CODEC.listOf().fieldOf("biomes").forGetter(source -> source.biomeEntries)
+                    BiomeEntry.CODEC.listOf().fieldOf("biomes").forGetter(source -> source.biomeEntries),
+                    ChunkGeneratorSettings.REGISTRY_CODEC.fieldOf("settings").forGetter(source -> source.settings)
             ).apply(instance, TerrariumBiomeSource::new)
     );
 
-    public TerrariumBiomeSource(List<BiomeEntry> biomeEntries) {
-        this(biomeEntries, Random.create());
+    public TerrariumBiomeSource(List<BiomeEntry> biomeEntries, RegistryEntry<ChunkGeneratorSettings> settings ) {
+        this(biomeEntries, Random.create(), settings);
     }
 
-    public TerrariumBiomeSource(List<BiomeEntry> biomeEntries, Random random) {
+    public TerrariumBiomeSource(List<BiomeEntry> biomeEntries, Random random, RegistryEntry<ChunkGeneratorSettings> settings) {
         this.biomeEntries = biomeEntries;
         this.noiseSampler = new PerlinNoiseSampler(random);
+        this.settings = settings;
     }
+
 
     public record BiomeEntry(
             RegistryEntry<Biome> biome,
-            double steepness,
+            double elevation,
             double temperature,
             double noiseWeight
     ) {
         public static final Codec<BiomeEntry> CODEC = RecordCodecBuilder.create(instance ->
                 instance.group(
                         Biome.REGISTRY_CODEC.fieldOf("biome").forGetter(BiomeEntry::biome),
-                        Codec.DOUBLE.fieldOf("steepness").forGetter(BiomeEntry::steepness),
+                        Codec.DOUBLE.fieldOf("elevation").forGetter(BiomeEntry::elevation),
                         Codec.DOUBLE.fieldOf("temperature").forGetter(BiomeEntry::temperature),
                         Codec.DOUBLE.fieldOf("noise_weight").forGetter(BiomeEntry::noiseWeight)
                 ).apply(instance, BiomeEntry::new)
@@ -67,60 +72,67 @@ public class TerrariumBiomeSource extends BiomeSource {
         return biomeEntries.stream().map(BiomeEntry::biome);
     }
 
+
     @Override
-    public RegistryEntry<Biome> getBiome(int x, int y, int z, MultiNoiseUtil.MultiNoiseSampler noise) {
-        double steepness = (x < radius || z < radius) ? 0 : getSteepness(x,z);
-        double temperature = noise.sample(x, y, z).temperatureNoise();
-        double noiseValue = noiseSampler.sample(x * 0.1, y * 0.1, z * 0.1);
+    public RegistryEntry<Biome> getBiome(int x, int elevation, int z, MultiNoiseUtil.MultiNoiseSampler noise) {
+        int adjustedX = x + CONFIG.adjustXoffset;
+        int adjustedZ = z + CONFIG.adjustZoffset;
+        double temperature = getElevationEffect(elevation, adjustedZ);
+        double height = getLocalElevation((adjustedX < 0 || adjustedZ < 0 || adjustedX > size || adjustedZ > size) ? 0 : getElevation(adjustedX , adjustedZ));
+        double noiseValue = getNoiseValue(adjustedX, elevation, adjustedZ);
 
-        return findBestBiome(steepness, temperature, noiseValue);
+        return findBestBiome(height, temperature, noiseValue);
     }
 
-    private RegistryEntry<Biome> findBestBiome(double steepness, double temp, double noise) {
-        BiomeEntry bestMatch = null;
-        double bestScore = Double.POSITIVE_INFINITY;
-
-        for (BiomeEntry entry : biomeEntries) {
-            double score = Math.sqrt(
-                    Math.pow(steepness - entry.steepness(), 2) * 2.0 +
-                            Math.pow(temp - entry.temperature(), 2) +
-                            Math.pow(noise * entry.noiseWeight(), 2)
-            );
-
-            if (score < bestScore) {
-                bestScore = score;
-                bestMatch = entry;
-            }
-        }
-
-        return bestMatch != null ? bestMatch.biome() : getFallbackBiome();
+    private double getNoiseValue(int x, int elevation, int z) {
+        return MathHelper.clamp(noiseSampler.sample(x * 0.1, elevation * 0.1, z * 0.1), -1.0, 1.0);
     }
 
-    private int getSteepness(int x, int z) {
-        int xTile = x / radius;
-        int zTile = z / radius;
-        int xPixel = x % radius;
-        int zPixel = z % radius;
-        long key = pack(xTile, zTile);
-
-        return cache.computeIfAbsent(key, k -> {
-            if (cache.size() > MAX_CACHE_SIZE) {
-                cache.clear(); // Simple eviction policy
-            }
-            int value = getSectionSteepness(xTile * radius, zTile * radius, radius);
-            return fillAndReturn(value, radius);
-        })[xPixel][zPixel];
+    private RegistryEntry<Biome> findBestBiome(double height, double temperature, double noise) {
+        return biomeEntries.stream()
+                .min(Comparator.comparingDouble(b ->
+                        Math.pow(b.elevation() - height, 2) * 1.8 +  // Temperature weight
+                                Math.pow(b.temperature() - temperature, 2) +  // Humidity weight
+                                Math.pow(b.noiseWeight() - noise, 2) * 0.2  // Elevation weight
+                ))
+                .orElseThrow().biome();
     }
 
-    private int[][] fillAndReturn(int value, int radius) {
-        int[][] arr = new int[radius][radius];
-        for (int[] row : arr) {
-            Arrays.fill(row, value);
-        }
-        return arr;
+    double getLatitudeTemperature(int z) {
+
+        double equatorPos = 0.5; // 75% of world width = equator
+        double normalizedZ = (double) z / size;
+        return Math.cos((normalizedZ - equatorPos) * Math.PI * 3); // Directly outputs -1.0 to 1.0
     }
 
-    private RegistryEntry<Biome> getFallbackBiome() {
-        return biomeEntries.isEmpty() ? null : biomeEntries.get(0).biome();
+    double getElevationEffect(int y, int z) {
+        // From latitude
+        return MathHelper.clamp(getLatitudeTemperature(z) - ((double) y / (settings.value().generationShapeConfig().height() * 3)) , -1.0, 1.0); // -0.5°C per 100 blocks
     }
+
+    double getLocalElevation(int y){
+        return MathHelper.clamp((y - settings.value().seaLevel()) / (double)(settings.value().generationShapeConfig().height() - settings.value().seaLevel()), -1.0, 1.0);
+    }
+    double truncate(double num, int places){
+        return  (int)(num * Math.pow(10, places)) / Math.pow(10, places); // truncatedNumber will be 10.78
+    }
+    @Override
+    public void addDebugInfo(List<String> info, BlockPos pos, MultiNoiseUtil.MultiNoiseSampler noiseSampler) {
+        int i = BiomeCoords.fromBlock(pos.getX());
+        int j = BiomeCoords.fromBlock(pos.getY());
+        int k = BiomeCoords.fromBlock(pos.getZ());
+        int adjustedX = i + CONFIG.adjustXoffset;
+        int adjustedZ = k + CONFIG.adjustZoffset;
+
+        info.add(
+                "Biome builder PV: "
+                        + " Elevation: "
+                        + truncate(getLocalElevation(j), 3)
+                        + " Temperature: "
+                        + truncate((adjustedX < 0 || adjustedZ < 0 || adjustedX > size || adjustedZ > size) ? 0 : getElevation(adjustedX , adjustedZ), 3)
+                        + " Noise: "
+                        + truncate(getNoiseValue(i, j, k), 3)
+        );
+    }
+
 }

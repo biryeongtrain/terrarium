@@ -28,7 +28,6 @@ public class HeightProvider {
     public static int offset = (int) (256 * Math.pow(2, CONFIG.zoom))/5;
     public static int size = (int) (256 * Math.pow(2, CONFIG.zoom));
     private static Map<Long, int[][]> cache = new ConcurrentHashMap<>();
-
     public static void init(){
         offset = (int) (256 * Math.pow(2, CONFIG.zoom))/5;
         size = (int) (256 * Math.pow(2, CONFIG.zoom));
@@ -101,7 +100,7 @@ public class HeightProvider {
         if (!cache.containsKey(key)) {
             getElevationFromHeightmap(key, xTile, zTile);
         }
-        return cache.get(key)[xPixel][zPixel];
+        return cache.get(key)[Math.abs(xPixel)][Math.abs(zPixel)];
     }
     public static int getSectionSteepness(int x, int z, int radius) {
         // Calculate bounds of the area to check

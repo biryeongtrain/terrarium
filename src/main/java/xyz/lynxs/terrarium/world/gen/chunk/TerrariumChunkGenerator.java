@@ -65,16 +65,19 @@ public class TerrariumChunkGenerator extends ChunkGenerator {
 
 
     public int getFromMap(int x, int z) {
-        //System.out.println("Zoom: " + zoom);
-        if (x < 0 || z < 0 || x  > size || z > size)
+        // Center offset - assumes world center is land
+        int adjustedX = x + CONFIG.adjustXoffset;
+        int adjustedZ = z + CONFIG.adjustZoffset;
+
+        if (adjustedX < 0 || adjustedZ < 0 || adjustedX > size || adjustedZ > size)
             return getMinimumY() - 1;
-        return getElevation(x, z) + CONFIG.startingY;
+
+        return getElevation(adjustedX, adjustedZ) + CONFIG.startingY;
     }
 
     public RegistryEntry<ChunkGeneratorSettings> getSettings() {
         return this.settings;
     }
-
 
     public static final MapCodec<TerrariumChunkGenerator> CODEC = RecordCodecBuilder.mapCodec(
             instance -> instance.group(
@@ -315,7 +318,7 @@ public class TerrariumChunkGenerator extends ChunkGenerator {
 
     @Override
     public void getDebugHudText(List<String> text, NoiseConfig noiseConfig, BlockPos pos) {
-        text.add("[Atlas CG] elevation: " + getElevation(pos.getX(), pos.getZ()));
+        text.add("[Atlas CG] elevation: " + getFromMap(pos.getX(), pos.getZ()));
     }
 
     private ChunkNoiseSampler createChunkNoiseSampler(Chunk chunk, StructureAccessor world, Blender blender, NoiseConfig noiseConfig) {
