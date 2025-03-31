@@ -172,8 +172,8 @@ public class TerrariumChunkGenerator extends ChunkGenerator {
         if (k <= 0) {
             return CompletableFuture.completedFuture(chunk);
         }
-        int x = chunk.getPos().x << 4;
-        int z = chunk.getPos().z << 4;
+        int x = (chunk.getPos().x << 4) + CONFIG.adjustXoffset;
+        int z = (chunk.getPos().z << 4) + CONFIG.adjustZoffset;
 
 
         int minimumCellY = MathHelper.floorDiv(generationShapeConfig.minimumY(), generationShapeConfig.verticalCellBlockCount());
