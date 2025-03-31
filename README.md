@@ -64,11 +64,10 @@ Generate 1:1 block-scale worlds from real elevation data, with dynamic tile load
 ## 🔧 **Configuration**  
 `/config/BlossomMods/Terrarium.json`:  
 ```json
-{
-  "additionalAlt": 1.0,    
+{   
   "zoom": 13,   // 2¹³ tiles = 8,192 tiles wide (≈2M blocks at 256px/tile).
   "worldHeight": 768,       // Max Y height.
-  "altitudeDropoff": 0.5,
   "startingY": 0,           // Base height offset (negative for deeper oceans).
-  "stoneDepth": 32      
+  "adjustXoffset": 400000, // Where on the map the world should generate: spawn location essentially!
+  "adjustZoffset": 800000 
 }
