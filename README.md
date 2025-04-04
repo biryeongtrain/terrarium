@@ -1,7 +1,7 @@
 # Terrarium
 **Pixel-Perfect Earth Terrain for Minecraft**  
 
-Generate 1:1 block-scale worlds from real elevation data, with dynamic tile loading and customizable terrain shaping.  
+Generate pixel-perfect worlds from real elevation data, with dynamic tile loading and customizable terrain shaping.  
 
 ### *Latest info*: Custom biomes, not configurable yet, go back a version for all biomes!
 ---
