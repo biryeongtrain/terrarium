@@ -3,11 +3,11 @@
 
 Generate pixel-perfect worlds from real elevation data, with dynamic tile loading and customizable terrain shaping.  
 
-### *Latest info*: Custom biomes, not configurable yet, go back a version for all biomes!
 ---
 
 ## 🌐 Terrain Data Pipeline
-- **Source**: AWS S3 (`elevation-tiles-prod/terrarium/{z}/{x}/{y}.png`)  
+- **Source**: AWS S3 (`elevation-tiles-prod/terrarium/{zoom}/{x}/{y}.png`)
+- **Temeperature** Personal Source Hosted on GitHub, I compiled this using QGIS. (`clim-monthly/{month}/{zoom}/{x}/{y}`)
 - **Pixel-to-Block**: 1 pixel = 1 Minecraft block.  
 - **Tile System**:  
   - Each tile = `256×256` pixels (`256×256` blocks ingame).  
