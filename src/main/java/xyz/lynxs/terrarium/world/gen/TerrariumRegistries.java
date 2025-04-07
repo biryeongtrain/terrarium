@@ -8,6 +8,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.dynamic.CodecHolder;
 import net.minecraft.world.gen.surfacebuilder.MaterialRules;
 
+import static xyz.lynxs.terrarium.Terrarium.CONFIG;
 import static xyz.lynxs.terrarium.world.gen.HeightProvider.getElevation;
 
 
@@ -41,7 +42,7 @@ public class TerrariumRegistries {
 
                 @Override
                 protected boolean test() {
-                    double elevation = getElevation(this.context.blockX, this.context.blockZ);
+                    double elevation = getElevation(this.context.blockX + CONFIG.adjustXoffset, this.context.blockZ + CONFIG.adjustZoffset);
                     return this.context.blockY > elevation - AboveSurfaceMaterialCondition.this.depth;
                 }
             }

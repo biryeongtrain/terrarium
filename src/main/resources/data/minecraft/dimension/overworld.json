@@ -5,128 +5,646 @@
     "biome_source": {
       "type": "terrarium:biome_source",
       "biomes": [
-
         {
-          "biome": "minecraft:warm_ocean",
+          "biome": "minecraft:deep_frozen_ocean",
           "elevation": -0.9,
-          "temperature": 0.8,
-          "noise_weight": 0.8
+          "temperature": -0.9,
+          "noise_weight": 0.5
         },
         {
-          "biome": "minecraft:ocean",
-          "elevation": -0.7,
-          "temperature": 0.3,
-          "noise_weight": 1.0
+          "biome": "minecraft:deep_cold_ocean",
+          "elevation": -0.9,
+          "temperature": -0.45,
+          "noise_weight": -0.5
+        },
+        {
+          "biome": "minecraft:deep_ocean",
+          "elevation": -0.9,
+          "temperature": 0.0,
+          "noise_weight": -0.5
+        },
+        {
+          "biome": "minecraft:deep_lukewarm_ocean",
+          "elevation": -0.9,
+          "temperature": 0.33,
+          "noise_weight": -0.1
         },
         {
           "biome": "minecraft:frozen_ocean",
-          "elevation": -0.6,
-          "temperature": -0.8,
-          "noise_weight": 0.7
-        },
-
-
-        {
-          "biome": "minecraft:beach",
-          "elevation": -0.3,
-          "temperature": 0.6,
-          "noise_weight": 1.2
-        },
-        {
-          "biome": "minecraft:mangrove_swamp",
-          "elevation": -0.4,
-          "temperature": 0.9,
-          "noise_weight": 0.9
-        },
-        {
-          "biome": "minecraft:swamp",
-          "elevation": -0.2,
-          "temperature": 0.4,
-          "noise_weight": 1.0
-        },
-
-
-        {
-          "biome": "minecraft:plains",
-          "elevation": 0.1,
-          "temperature": 0.2,
-          "noise_weight": 1.5
-        },
-        {
-          "biome": "minecraft:desert",
-          "elevation": 0.0,
-          "temperature": 1.0,
-          "noise_weight": 1.0
-        },
-        {
-          "biome": "minecraft:savanna",
-          "elevation": 0.2,
-          "temperature": 0.8,
-          "noise_weight": 0.8
-        },
-        {
-          "biome": "minecraft:snowy_plains",
-          "elevation": 0.1,
-          "temperature": -0.6,
-          "noise_weight": 1.0
-        },
-
-
-        {
-          "biome": "minecraft:forest",
-          "elevation": 0.4,
-          "temperature": 0.3,
-          "noise_weight": 1.0
-        },
-        {
-          "biome": "minecraft:birch_forest",
-          "elevation": 0.35,
-          "temperature": 0.4,
-          "noise_weight": 0.9
-        },
-        {
-          "biome": "minecraft:dark_forest",
-          "elevation": 0.5,
-          "temperature": 0.2,
-          "noise_weight": 0.7
-        },
-        {
-          "biome": "minecraft:jungle",
-          "elevation": 0.3,
-          "temperature": 1.0,
-          "noise_weight": 0.8
-        },
-
-
-        {
-          "biome": "minecraft:windswept_hills",
-          "elevation": 0.7,
-          "temperature": 0.1,
-          "noise_weight": 0.6
-        },
-        {
-          "biome": "minecraft:meadow",
-          "elevation": 0.65,
-          "temperature": 0.0,
-          "noise_weight": 1.0
-        },
-        {
-          "biome": "minecraft:snowy_slopes",
-          "elevation": 0.9,
+          "elevation": -0.85,
           "temperature": -0.8,
           "noise_weight": 0.5
         },
         {
-          "biome": "minecraft:jagged_peaks",
-          "elevation": 1.0,
-          "temperature": -1.0,
-          "noise_weight": 0.3
+          "biome": "minecraft:cold_ocean",
+          "elevation": -0.85,
+          "temperature": -0.4,
+          "noise_weight": -0.5
+        },
+        {
+          "biome": "minecraft:ocean",
+          "elevation": -0.85,
+          "temperature": 0.1,
+          "noise_weight": -0.5
+        },
+        {
+          "biome": "minecraft:warm_ocean",
+          "elevation": -0.85,
+          "temperature": 0.75,
+          "noise_weight": -0.1
+        },
+        {
+          "biome": "minecraft:lukewarm_ocean",
+          "elevation": -0.85,
+          "temperature": 0.33,
+          "noise_weight": 0.1
+        },
+        {
+          "biome": "minecraft:swamp",
+          "elevation": -0.8,
+          "temperature": 0.4,
+          "noise_weight": 0.7
+        },
+        {
+          "biome": "minecraft:snowy_plains",
+          "elevation": -0.6,
+          "temperature": -0.66,
+          "noise_weight": -0.7
+        },
+        {
+          "biome": "minecraft:snowy_plains",
+          "elevation": -0.2,
+          "temperature": -0.62,
+          "noise_weight": -0.4
+        },
+        {
+          "biome": "minecraft:snowy_plains",
+          "elevation": 0.2,
+          "temperature": -0.7,
+          "noise_weight": -0.7
+        },
+        {
+          "biome": "minecraft:ice_spikes",
+          "elevation": 0.5,
+          "temperature": -0.8,
+          "noise_weight": -0.7
+        },
+        {
+          "biome": "minecraft:snowy_taiga",
+          "elevation": 0.7,
+          "temperature": -0.5,
+          "noise_weight": -0.7
+        },
+        {
+          "biome": "minecraft:snowy_taiga",
+          "elevation": 0.5,
+          "temperature": -0.5,
+          "noise_weight": -0.7
+        },
+        {
+          "biome": "minecraft:snowy_taiga",
+          "elevation": 0.0,
+          "temperature": -0.5,
+          "noise_weight": -0.7
+        },
+        {
+          "biome": "minecraft:plains",
+          "elevation": -0.6,
+          "temperature": 0.5,
+          "noise_weight": 0.5
+        },
+        {
+          "biome": "minecraft:plains",
+          "elevation": -0.3,
+          "temperature": 0.1,
+          "noise_weight": 0.5
+        },
+        {
+          "biome": "minecraft:plains",
+          "elevation": 0.2,
+          "temperature": 0.4,
+          "noise_weight": 0.5
+        },
+        {
+          "biome": "minecraft:plains",
+          "elevation": 0.5,
+          "temperature": 0.5,
+          "noise_weight": 0.5
+        },
+        {
+          "biome": "minecraft:forest",
+          "elevation": 0.0,
+          "temperature": 0.2,
+          "noise_weight": 0.5
+        },
+        {
+          "biome": "minecraft:forest",
+          "elevation": 0.2,
+          "temperature": 0.3,
+          "noise_weight": 0.5
+        },
+        {
+          "biome": "minecraft:forest",
+          "elevation": 0.5,
+          "temperature": 0.4,
+          "noise_weight": 0.5
+        },{
+          "biome": "minecraft:taiga",
+          "elevation": 0.0,
+          "temperature": 0.0,
+          "noise_weight": -0.5
+        },
+        {
+          "biome": "minecraft:taiga",
+          "elevation": 0.5,
+          "temperature": 0.2,
+          "noise_weight": -0.5
+        },
+        {
+          "biome": "minecraft:taiga",
+          "elevation": -0.2,
+          "temperature": -0.1,
+          "noise_weight": -0.5
+        },
+        {
+          "biome": "minecraft:sunflower_plains",
+          "elevation": 0.2,
+          "temperature": 0.4,
+          "noise_weight": 0.5
+        },
+        {
+          "biome": "minecraft:sunflower_plains",
+          "elevation": 0.5,
+          "temperature": 0.3,
+          "noise_weight": 0.5
+        },
+        {
+          "biome": "minecraft:sunflower_plains",
+          "elevation": 0.0,
+          "temperature": 0.3,
+          "noise_weight": 0.5
+        },
+        {
+          "biome": "minecraft:flower_forest",
+          "elevation": 0.2,
+          "temperature": 0.4,
+          "noise_weight": -0.5
+        },
+        {
+          "biome": "minecraft:flower_forest",
+          "elevation": 0.0,
+          "temperature": 0.4,
+          "noise_weight": -0.5
+        },
+        {
+          "biome": "minecraft:flower_forest",
+          "elevation": -0.2,
+          "temperature": 0.4,
+          "noise_weight": -0.5
+        },
+        {
+          "biome": "minecraft:birch_forest",
+          "elevation": -0.2,
+          "temperature": 0.4,
+          "noise_weight": 0.7
+        },
+        {
+          "biome": "minecraft:birch_forest",
+          "elevation": 0.2,
+          "temperature": 0.4,
+          "noise_weight": 0.7
+        },
+        {
+          "biome": "minecraft:birch_forest",
+          "elevation": 0.6,
+          "temperature": 0.4,
+          "noise_weight": 0.7
+        },
+        {
+          "biome": "minecraft:dark_forest",
+          "elevation": -0.4,
+          "temperature": 0.5,
+          "noise_weight": -0.9
+        },
+        {
+          "biome": "minecraft:dark_forest",
+          "elevation": -0.2,
+          "temperature": 0.5,
+          "noise_weight": -0.9
+        },
+        {
+          "biome": "minecraft:savanna",
+          "elevation": 0.2,
+          "temperature": 0.7,
+          "noise_weight": 0.8
+        },
+        {
+          "biome": "minecraft:savanna",
+          "elevation": -0.2,
+          "temperature": 0.5,
+          "noise_weight": 0.8
+        },
+        {
+          "biome": "minecraft:savanna",
+          "elevation": 0.5,
+          "temperature": 0.75,
+          "noise_weight": 0.8
+        },
+        {
+          "biome": "minecraft:jungle",
+          "elevation": 0.2,
+          "temperature": 0.6,
+          "noise_weight": -0.7
+        },
+        {
+          "biome": "minecraft:jungle",
+          "elevation": -0.2,
+          "temperature": 0.5,
+          "noise_weight": -0.7
+        },
+        {
+          "biome": "minecraft:jungle",
+          "elevation": 0.4,
+          "temperature": 0.66,
+          "noise_weight": -0.7
         },
         {
           "biome": "minecraft:badlands",
-          "elevation": 0.15,
+          "elevation": 0.2,
+          "temperature": 0.8,
+          "noise_weight": 0.7
+        },
+        {
+          "biome": "minecraft:badlands",
+          "elevation": -0.2,
+          "temperature": 0.8,
+          "noise_weight": 0.7
+        },
+        {
+          "biome": "minecraft:badlands",
+          "elevation": 0.5,
+          "temperature": 0.8,
+          "noise_weight": 0.7
+        },
+        {
+          "biome": "minecraft:wooded_badlands",
+          "elevation": 0.2,
+          "temperature": 0.6,
+          "noise_weight": 0.8
+        },
+        {
+          "biome": "minecraft:wooded_badlands",
+          "elevation": -0.2,
+          "temperature": 0.6,
+          "noise_weight": 0.8
+        },
+        {
+          "biome": "minecraft:wooded_badlands",
+          "elevation": 0.5,
+          "temperature": 0.6,
+          "noise_weight": 0.8
+        },
+        {
+          "biome": "minecraft:stony_shore",
+          "elevation": -0.8,
+          "temperature": 0.3,
+          "noise_weight": 0.7
+        },
+        {
+          "biome": "minecraft:snowy_beach",
+          "elevation": -0.8,
+          "temperature": -0.5,
+          "noise_weight": -0.7
+        },
+        {
+          "biome": "minecraft:beach",
+          "elevation": -0.8,
+          "temperature": 0.5,
+          "noise_weight": 0.25
+        },
+        {
+          "biome": "minecraft:beach",
+          "elevation": -0.8,
+          "temperature": 0.8,
+          "noise_weight": -0.25
+        },
+        {
+          "biome": "minecraft:desert",
+          "elevation": -0.75,
+          "temperature": 0.8,
+          "noise_weight": 0.25
+        },
+        {
+          "biome": "minecraft:desert",
+          "elevation": -0.5,
+          "temperature": 0.8,
+          "noise_weight": 0.25
+        },
+        {
+          "biome": "minecraft:desert",
+          "elevation": -0.1,
+          "temperature": 0.8,
+          "noise_weight": 0.6
+        },
+        {
+          "biome": "minecraft:desert",
+          "elevation": 0.25,
+          "temperature": 0.8,
+          "noise_weight": 0.66
+        },
+        {
+          "biome": "minecraft:desert",
+          "elevation": 0.6,
+          "temperature": 0.8,
+          "noise_weight": 0.75
+        },
+        {
+          "biome": "minecraft:windswept_savanna",
+          "elevation": -0.2,
+          "temperature": 0.66,
+          "noise_weight": 0.9
+        },
+        {
+          "biome": "minecraft:windswept_savanna",
+          "elevation": 0.2,
           "temperature": 0.7,
+          "noise_weight": 0.9
+        },
+        {
+          "biome": "minecraft:windswept_savanna",
+          "elevation": 0.5,
+          "temperature": 0.7,
+          "noise_weight": 0.9
+        },
+        {
+          "biome": "minecraft:sparse_jungle",
+          "elevation": -0.5,
+          "temperature": 0.66,
+          "noise_weight": -0.6
+        },
+        {
+          "biome": "minecraft:sparse_jungle",
+          "elevation": -0.1,
+          "temperature": 0.66,
+          "noise_weight": -0.6
+        },
+        {
+          "biome": "minecraft:sparse_jungle",
+          "elevation": 0.2,
+          "temperature": 0.5,
+          "noise_weight": -0.6
+        },
+        {
+          "biome": "minecraft:sparse_jungle",
+          "elevation": 0.5,
+          "temperature": 0.5,
+          "noise_weight": -0.6
+        },
+        {
+          "biome": "minecraft:snowy_slopes",
+          "elevation": 0.5,
+          "temperature": -0.75,
+          "noise_weight": -0.6
+        },
+        {
+          "biome": "minecraft:snowy_slopes",
+          "elevation": 0.7,
+          "temperature": -0.75,
+          "noise_weight": -0.6
+        },
+        {
+          "biome": "minecraft:snowy_slopes",
+          "elevation": 0.9,
+          "temperature": -0.75,
+          "noise_weight": -0.6
+        },
+        {
+          "biome": "minecraft:snowy_slopes",
+          "elevation": 0.2,
+          "temperature": -0.75,
+          "noise_weight": -0.6
+        },
+        {
+          "biome": "minecraft:grove",
+          "elevation": 0.5,
+          "temperature": -0.6,
+          "noise_weight": -0.8
+        },
+        {
+          "biome": "minecraft:grove",
+          "elevation": 0.2,
+          "temperature": -0.6,
+          "noise_weight": -0.8
+        },
+        {
+          "biome": "minecraft:grove",
+          "elevation": -0.1,
+          "temperature": -0.6,
+          "noise_weight": -0.8
+        },
+        {
+          "biome": "minecraft:grove",
+          "elevation": 0.7,
+          "temperature": -0.6,
+          "noise_weight": -0.8
+        },
+        {
+          "biome": "minecraft:savanna_plateau",
+          "elevation": -0.3,
+          "temperature": 0.6,
+          "noise_weight": 0.8
+        },
+        {
+          "biome": "minecraft:savanna_plateau",
+          "elevation": 0.1,
+          "temperature": 0.6,
+          "noise_weight": 0.8
+        },
+        {
+          "biome": "minecraft:savanna_plateau",
+          "elevation": 0.6,
+          "temperature": 0.6,
+          "noise_weight": 0.8
+        },
+        {
+          "biome": "minecraft:windswept_hills",
+          "elevation": -0.3,
+          "temperature": 0.2,
+          "noise_weight": 0.8
+        },
+        {
+          "biome": "minecraft:windswept_hills",
+          "elevation": -0.6,
+          "temperature": 0.2,
+          "noise_weight": 0.8
+        },
+        {
+          "biome": "minecraft:windswept_hills",
+          "elevation": 0.25,
+          "temperature": 0.2,
+          "noise_weight": 0.8
+        },
+        {
+          "biome": "minecraft:windswept_hills",
+          "elevation": 0.6,
+          "temperature": 0.2,
+          "noise_weight": 0.8
+        },
+        {
+          "biome": "minecraft:windswept_forest",
+          "elevation": -0.4,
+          "temperature": 0.3,
+          "noise_weight": 0.33
+        },
+        {
+          "biome": "minecraft:windswept_forest",
+          "elevation": -0.1,
+          "temperature": 0.3,
+          "noise_weight": 0.33
+        },
+        {
+          "biome": "minecraft:windswept_forest",
+          "elevation": 0.2,
+          "temperature": 0.3,
+          "noise_weight": 0.33
+        },
+        {
+          "biome": "minecraft:windswept_forest",
+          "elevation": 0.5,
+          "temperature": 0.3,
+          "noise_weight": 0.33
+        },
+        {
+          "biome": "minecraft:meadow",
+          "elevation": -0.4,
+          "temperature": 0.1,
+          "noise_weight": 0.4
+        },
+        {
+          "biome": "minecraft:meadow",
+          "elevation": -0.1,
+          "temperature": 0.1,
+          "noise_weight": 0.4
+        },
+        {
+          "biome": "minecraft:meadow",
+          "elevation": 0.33,
+          "temperature": 0.1,
+          "noise_weight": 0.4
+        },
+        {
+          "biome": "minecraft:meadow",
+          "elevation": 0.66,
+          "temperature": 0.1,
+          "noise_weight": 0.4
+        },
+        {
+          "biome": "minecraft:jagged_peaks",
+          "elevation": 0.4,
+          "temperature": -0.25,
+          "noise_weight": -1.0
+        },
+        {
+          "biome": "minecraft:jagged_peaks",
+          "elevation": 0.7,
+          "temperature": -0.25,
+          "noise_weight": -1.0
+        },
+        {
+          "biome": "minecraft:frozen_peaks",
+          "elevation": 0.5,
+          "temperature": -0.8,
+          "noise_weight": -0.66
+        },
+        {
+          "biome": "minecraft:frozen_peaks",
+          "elevation": 0.75,
+          "temperature": -0.8,
+          "noise_weight": -0.66
+        },
+        {
+          "biome": "minecraft:stony_peaks",
+          "elevation": 0.55,
+          "temperature": 0.6,
+          "noise_weight": 0.66
+        },
+        {
+          "biome": "minecraft:stony_peaks",
+          "elevation": 0.85,
+          "temperature": 0.2,
+          "noise_weight": 0.66
+        },
+        {
+          "biome": "minecraft:bamboo_jungle",
+          "elevation": 0.55,
+          "temperature": 0.5,
           "noise_weight": 0.1
+        },
+        {
+          "biome": "minecraft:bamboo_jungle",
+          "elevation": 0.15,
+          "temperature": 0.67,
+          "noise_weight": 0.1
+        },
+        {
+          "biome": "minecraft:bamboo_jungle",
+          "elevation": -0.15,
+          "temperature": 0.67,
+          "noise_weight": 0.1
+        },
+        {
+          "biome": "minecraft:lush_caves",
+          "elevation": -0.95,
+          "temperature": 0.47,
+          "noise_weight": -0.1
+        },
+        {
+          "biome": "minecraft:dripstone_caves",
+          "elevation": -0.95,
+          "temperature": 0.67,
+          "noise_weight": 0.7
+        },
+        {
+          "biome": "minecraft:mangrove_swamp",
+          "elevation": -0.8,
+          "temperature": 0.67,
+          "noise_weight": -0.7
+        },
+        {
+          "biome": "minecraft:mangrove_swamp",
+          "elevation": -0.7,
+          "temperature": 0.67,
+          "noise_weight": -0.9
+        },
+        {
+          "biome": "minecraft:deep_dark",
+          "elevation": -0.95,
+          "temperature": 0.2,
+          "noise_weight": -0.9
+        },
+        {
+          "biome": "minecraft:cherry_grove",
+          "elevation": -0.2,
+          "temperature": 0.2,
+          "noise_weight": -0.9
+        },
+        {
+          "biome": "minecraft:cherry_grove",
+          "elevation": 0.2,
+          "temperature": 0.2,
+          "noise_weight": -0.7
+        },
+        {
+          "biome": "minecraft:cherry_grove",
+          "elevation": 0.57,
+          "temperature": 0.2,
+          "noise_weight": -0.6
+        },
+        {
+          "biome": "minecraft:cherry_grove",
+          "elevation": 0.77,
+          "temperature": 0.2,
+          "noise_weight": -0.4
         }
       ],
       "settings": "minecraft:overworld"

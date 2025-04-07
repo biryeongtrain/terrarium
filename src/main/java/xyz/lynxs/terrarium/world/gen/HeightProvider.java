@@ -22,8 +22,7 @@ import static xyz.lynxs.terrarium.Terrarium.CONFIG;
 
 
 public class HeightProvider {
-    private static final String CACHE_DIR = "./world/tiles/";
-    private static final String TILE_URL = "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/";
+    private static final String CACHE_DIR = "/elevation/";
     private static final Logger LOGGER = Terrarium.LOGGER;
     public static int offset = (int) (256 * Math.pow(2, CONFIG.zoom))/5;
     public static int size = (int) (256 * Math.pow(2, CONFIG.zoom));
@@ -37,10 +36,9 @@ public class HeightProvider {
     private static void getElevationFromHeightmap(long key, int xTile, int zTile) {
 
 
-        String cachePath = CACHE_DIR + CONFIG.zoom + "/" + xTile + "/" + zTile + ".png";
-        String urlString = TILE_URL + CONFIG.zoom + "/" + xTile + "/" + zTile + ".png";
-        //System.out.println(xPixel);
-        //System.out.println(yPixel);
+        String cachePath = CONFIG.CACHE_DIR + CACHE_DIR + CONFIG.zoom + "/" + xTile + "/" + zTile + ".png";
+        String urlString = CONFIG.ELEVATION_URL + CONFIG.zoom + "/" + xTile + "/" + zTile + ".png";
+
         File cacheFile = new File(cachePath);
         if (cacheFile.exists()) {
             try {
@@ -69,10 +67,10 @@ public class HeightProvider {
                 }
             } catch (IOException e) {
                 LOGGER.error("Failed to download tile: {}", e.getMessage());
-                //cache.put(pack(x,z), 64);
             }
         }
     }
+
     private static int[][] toIntHeightmap(BufferedImage image){
         int[][] arr = new int[image.getWidth()][image.getHeight()];
         for(int i = 0; i < image.getWidth(); i++){
@@ -80,7 +78,6 @@ public class HeightProvider {
 
                 Color rgb = new Color(image.getRGB(i, j));
                 double elevation = (rgb.getRed() * 256 + rgb.getGreen() + rgb.getBlue() / 256.0) - 32768;
-                //System.out.println(elevation);
                 arr[i][j] = (int) ((elevation / 8850) * CONFIG.worldHeight);
 
             }
@@ -101,28 +98,6 @@ public class HeightProvider {
             getElevationFromHeightmap(key, xTile, zTile);
         }
         return cache.get(key)[Math.abs(xPixel)][Math.abs(zPixel)];
-    }
-    public static int getSectionSteepness(int x, int z, int radius) {
-        // Calculate bounds of the area to check
-        int minX = Math.max(x - radius, 0);
-        int maxX = x + radius;
-        int minZ = Math.max(z - radius, 0);
-        int maxZ = z + radius;
-
-        int minHeight = Integer.MAX_VALUE;
-        int maxHeight = Integer.MIN_VALUE;
-
-        // Iterate through all positions in the square area
-        for (int currentX = minX; currentX <= maxX; currentX++) {
-            for (int currentZ = minZ; currentZ <= maxZ; currentZ++) {
-                int elevation = getElevation(currentX, currentZ);
-                if (elevation < minHeight) minHeight = elevation;
-                if (elevation > maxHeight) maxHeight = elevation;
-            }
-        }
-
-        // Return the difference (steepness)
-        return maxHeight - minHeight;
     }
 
     public static long pack(int x, int z) {

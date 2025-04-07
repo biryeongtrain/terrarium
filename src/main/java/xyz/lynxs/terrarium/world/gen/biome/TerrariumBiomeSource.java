@@ -13,6 +13,7 @@ import net.minecraft.world.biome.source.BiomeCoords;
 import net.minecraft.world.biome.source.BiomeSource;
 import net.minecraft.world.biome.source.util.MultiNoiseUtil;
 import net.minecraft.world.gen.chunk.ChunkGeneratorSettings;
+import net.minecraft.world.gen.densityfunction.DensityFunction;
 
 
 import java.util.Comparator;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static xyz.lynxs.terrarium.Terrarium.CONFIG;
+import static xyz.lynxs.terrarium.world.gen.BiomeProvider.getTemperature;
 import static xyz.lynxs.terrarium.world.gen.HeightProvider.*;
 
 public class TerrariumBiomeSource extends BiomeSource {
@@ -77,7 +79,8 @@ public class TerrariumBiomeSource extends BiomeSource {
     public RegistryEntry<Biome> getBiome(int x, int elevation, int z, MultiNoiseUtil.MultiNoiseSampler noise) {
         int adjustedX = x + CONFIG.adjustXoffset;
         int adjustedZ = z + CONFIG.adjustZoffset;
-        double temperature = getElevationEffect(elevation, adjustedZ);
+        double temperature = getTemperature(adjustedX, adjustedZ, CONFIG.zoom);
+        temperature =  temperature > 1 ? noise.sample(x, elevation, z).temperatureNoise() : temperature;
         double height = getLocalElevation((adjustedX < 0 || adjustedZ < 0 || adjustedX > size || adjustedZ > size) ? 0 : getElevation(adjustedX , adjustedZ));
         double noiseValue = getNoiseValue(adjustedX, elevation, adjustedZ);
 
@@ -91,24 +94,14 @@ public class TerrariumBiomeSource extends BiomeSource {
     private RegistryEntry<Biome> findBestBiome(double height, double temperature, double noise) {
         return biomeEntries.stream()
                 .min(Comparator.comparingDouble(b ->
-                        Math.pow(b.elevation() - height, 2) * 1.8 +  // Temperature weight
-                                Math.pow(b.temperature() - temperature, 2) +  // Humidity weight
-                                Math.pow(b.noiseWeight() - noise, 2) * 0.2  // Elevation weight
+                        Math.pow(b.elevation() - height, 2) * 0.7 +
+                                Math.pow(b.temperature() - temperature, 2) +
+                                Math.pow(b.noiseWeight() - noise, 2) * 0.5
                 ))
                 .orElseThrow().biome();
     }
 
-    double getLatitudeTemperature(int z) {
 
-        double equatorPos = 0.5; // 75% of world width = equator
-        double normalizedZ = (double) z / size;
-        return Math.cos((normalizedZ - equatorPos) * Math.PI * 3); // Directly outputs -1.0 to 1.0
-    }
-
-    double getElevationEffect(int y, int z) {
-        // From latitude
-        return MathHelper.clamp(getLatitudeTemperature(z) - ((double) y / (settings.value().generationShapeConfig().height() * 3)) , -1.0, 1.0); // -0.5°C per 100 blocks
-    }
 
     double getLocalElevation(int y){
         return MathHelper.clamp((y - settings.value().seaLevel()) / (double)(settings.value().generationShapeConfig().height() - settings.value().seaLevel()), -1.0, 1.0);
@@ -121,15 +114,15 @@ public class TerrariumBiomeSource extends BiomeSource {
         int i = BiomeCoords.fromBlock(pos.getX());
         int j = BiomeCoords.fromBlock(pos.getY());
         int k = BiomeCoords.fromBlock(pos.getZ());
-        int adjustedX = i + CONFIG.adjustXoffset;
         int adjustedZ = k + CONFIG.adjustZoffset;
+        int adjustedX = i + CONFIG.adjustXoffset;
 
         info.add(
                 "Biome builder PV: "
                         + " Elevation: "
                         + truncate(getLocalElevation(j), 3)
                         + " Temperature: "
-                        + truncate((adjustedX < 0 || adjustedZ < 0 || adjustedX > size || adjustedZ > size) ? 0 : getElevation(adjustedX , adjustedZ), 3)
+                        + truncate(getTemperature(adjustedX, adjustedZ, CONFIG.zoom), 3)
                         + " Noise: "
                         + truncate(getNoiseValue(i, j, k), 3)
         );
