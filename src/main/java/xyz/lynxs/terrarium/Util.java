@@ -1,29 +1,37 @@
 package xyz.lynxs.terrarium;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryEntryLookup;
-import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.NotNull;
 
 public class Util {
-    public static int lon2tile(long lon,int zoom) { return (int) Math.floor((lon+180)/360*Math.pow(2,zoom)); }
+    private static final double EARTH_RADIUS = 6378137.0; // Standard Mercator Earth radius (meters)
+    private static final double MAX_MERCATOR = EARTH_RADIUS * Math.PI; // ~20,037,508 meters
+
+    /**
+     * Convert integer X/Z in a variable-sized grid to latitude/longitude.
+     * @param x X coordinate (integer, 0 to maxSize-1)
+     * @param z Z coordinate (integer, 0 to maxSize-1)
+     * @param maxSize The maximum grid size (e.g., 256, 512, etc.)
+     * @return double[] where [0] = longitude, [1] = latitude
+     */
+    public static double[] gridToLatLon(int x, int z, int maxSize) {
+        // Normalize X (longitude is linear)
+        double normalizedX = (x / (double) (maxSize - 1)) * 2 - 1; // [-1, 1]
+        double lon = normalizedX * 180.0; // Longitude ranges -180 to 180
+
+        // Normalize Z (latitude is nonlinear due to Mercator)
+        double normalizedZ = 1.0 - (z / (double) (maxSize - 1)); // Flip Z (0=top, maxSize-1=bottom)
+        double mercatorZ = normalizedZ * 2 * MAX_MERCATOR - MAX_MERCATOR; // [-MAX_MERCATOR, MAX_MERCATOR]
+        double lat = Math.toDegrees(Math.atan(Math.sinh(mercatorZ / EARTH_RADIUS))); // Inverse Mercator
+
+        return new double[]{lon, lat};
+    }
+    public static double truncate(double num, int places){
+        return  (int)(num * Math.pow(10, places)) / Math.pow(10, places); // truncatedNumber will be 10.78
+    }
+
+    public static int lon2tile(long lon,int zoom) { return (int) Math.floor((double) (lon + 180) /360*Math.pow(2,zoom)); }
     public static int  lat2tile(long lat,int zoom)  { return (int) Math.floor((1-Math.log(Math.tan(lat*Math.PI/180) + 1/Math.cos(lat*Math.PI/180))/Math.PI)/2 *Math.pow(2,zoom)); }
 
-    public static BlockState getBlockState(String key) {
-        // Convert the key to a Minecraft identifier (e.g., "TERRACOTTA" -> "minecraft:terracotta")
-        Identifier blockId = Identifier.of("minecraft", key.toLowerCase());
-
-        // Look up the block in the registry
-        Block block = Registries.BLOCK.get(blockId);
-
-        // Return the block's default state (or AIR if the block is not found)
-        return block != null ? block.getDefaultState() : Blocks.SAND.getDefaultState();
-    }
-    public static BlockState getBlockFromList(int index, String @NotNull [] args){
-        return getBlockState(args[index]);
+    public static long pack(int x, int z) {
+        return ((long) x & 0xFFFFFFFFL) | ((long) z & 0xFFFFFFFFL) << 32;
     }
 }

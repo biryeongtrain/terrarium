@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -17,38 +17,37 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static xyz.lynxs.terrarium.Terrarium.CONFIG;
-import static xyz.lynxs.terrarium.world.gen.HeightProvider.pack;
+import static xyz.lynxs.terrarium.Util.pack;
 
 public class BiomeProvider {
 
         private static final String CACHE_DIR = "/temperature/";
         private static final Logger LOGGER = Terrarium.LOGGER;
-        private static Map<Long, double[][]> cache = new ConcurrentHashMap<>();
+        private static final Map<Long, double[][]> cache = new ConcurrentHashMap<>();
 
 
-        @Deprecated
-        private static void getTemperatureFromHeightmap(long key, int xTile, int zTile, int month) {
+
+        private static BufferedImage getTemperatureFromHeightmap(int xTile, int zTile, int month) {
 
 
             String cachePath = CONFIG.CACHE_DIR + CACHE_DIR + month + "/" + 11 + "/" + xTile + "/" + zTile + ".png";
-            String urlString = CONFIG.TEMPERATURE_URL + month + "/" + 11 + "/" + xTile + "/" + zTile + ".png";
+            URI uri = CONFIG.TEMPERATURE_URL.resolve(month + "/" + 11 + "/" + xTile + "/" + zTile + ".png");
 
             File cacheFile = new File(cachePath);
             if (cacheFile.exists()) {
                 try {
-                    cache.put(key, toIntHeightmap(ImageIO.read(cacheFile)));
+                    return ImageIO.read(cacheFile);
 
                 } catch (Exception e) {
                     LOGGER.error("Failed to load tile from cache: {}", e.getMessage());
                 }
             }
-            else {
                 try {
-                    URL url = new URL(urlString);
-                    try (InputStream inputStream = url.openStream()) {
+                    try (InputStream inputStream = uri.toURL().openStream()) {
                         BufferedImage tileImage = ImageIO.read(inputStream);
+
                         if (tileImage == null) {
-                            throw new IOException("Failed to read image from URL: " + urlString);
+                            throw new IOException("Failed to read image from URL: " + uri.toString());
                         }
 
                         Path cacheDir = Paths.get(cacheFile.getParent());
@@ -56,29 +55,29 @@ public class BiomeProvider {
                             Files.createDirectories(cacheDir);
                         }
                         ImageIO.write(tileImage, "png", cacheFile);
+                        return tileImage;
 
-                        cache.put(key, toIntHeightmap(tileImage));
                     }
                 } catch (IOException e) {
                     LOGGER.error("Failed to download tile: {}", e.getMessage());
                 }
-            }
+                return new BufferedImage(256, 256, BufferedImage.TYPE_INT_RGB);
         }
 
         private static double[][] toIntHeightmap(BufferedImage image){
             double[][] arr = new double[image.getWidth()][image.getHeight()];
             for(int i = 0; i < image.getWidth(); i++){
                 for(int j = 0; j < image.getHeight(); j++){
-                    arr[i][j] = (double) (new Color(image.getRGB(i, j)).getRed()) / 254;
+                    arr[i][j] = ((double) (new Color(image.getRGB(i, j)).getRed()) / 50) - 2;
                 }
             }
             return arr;
         }
 
 
-    public static double getTemperature(int x, int z, int worldZoom) {
+    public static double getTemperature(int x, int z) {
         // Convert world coordinates to temperature data coordinates
-        double scaleFactor = Math.pow(2, 11 - worldZoom);
+        double scaleFactor = Math.pow(2, 11 - CONFIG.zoom);
         int scaledX = (int)(x * scaleFactor);
         int scaledZ = (int)(z * scaleFactor);
 
@@ -91,13 +90,12 @@ public class BiomeProvider {
 
         return bilinearInterpolate(tile, tileX, tileZ, scaleFactor);
     }
+
     private static double[][] getTemperatureTile(int xTile, int zTile) {
         long key = pack(xTile, zTile);
 
         if (cache.size() > 64) cache.clear();
-        if(!cache.containsKey(key))
-            getTemperatureFromHeightmap(key, xTile, zTile, 0);
-        return cache.get(key);
+        return cache.computeIfAbsent(key,k -> toIntHeightmap(getTemperatureFromHeightmap(xTile, zTile, 0)));
     }
 
     private static double bilinearInterpolate(double[][] tile, double x, double z, double scale) {

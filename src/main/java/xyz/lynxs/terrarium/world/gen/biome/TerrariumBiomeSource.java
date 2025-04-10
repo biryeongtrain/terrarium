@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static xyz.lynxs.terrarium.Terrarium.CONFIG;
+import static xyz.lynxs.terrarium.Util.truncate;
 import static xyz.lynxs.terrarium.world.gen.BiomeProvider.getTemperature;
 import static xyz.lynxs.terrarium.world.gen.HeightProvider.*;
 
@@ -79,7 +80,7 @@ public class TerrariumBiomeSource extends BiomeSource {
     public RegistryEntry<Biome> getBiome(int x, int elevation, int z, MultiNoiseUtil.MultiNoiseSampler noise) {
         int adjustedX = x + CONFIG.adjustXoffset;
         int adjustedZ = z + CONFIG.adjustZoffset;
-        double temperature = getTemperature(adjustedX, adjustedZ, CONFIG.zoom);
+        double temperature = getTemperature(adjustedX, adjustedZ);
         temperature =  temperature > 1 ? noise.sample(x, elevation, z).temperatureNoise() : temperature;
         double height = getLocalElevation((adjustedX < 0 || adjustedZ < 0 || adjustedX > size || adjustedZ > size) ? 0 : getElevation(adjustedX , adjustedZ));
         double noiseValue = getNoiseValue(adjustedX, elevation, adjustedZ);
@@ -88,7 +89,7 @@ public class TerrariumBiomeSource extends BiomeSource {
     }
 
     private double getNoiseValue(int x, int elevation, int z) {
-        return MathHelper.clamp(noiseSampler.sample(x * 0.1, elevation * 0.1, z * 0.1), -1.0, 1.0);
+        return noiseSampler.sample(x * 0.01, elevation * 0.01, z * 0.01);
     }
 
     private RegistryEntry<Biome> findBestBiome(double height, double temperature, double noise) {
@@ -106,9 +107,7 @@ public class TerrariumBiomeSource extends BiomeSource {
     double getLocalElevation(int y){
         return MathHelper.clamp((y - settings.value().seaLevel()) / (double)(settings.value().generationShapeConfig().height() - settings.value().seaLevel()), -1.0, 1.0);
     }
-    double truncate(double num, int places){
-        return  (int)(num * Math.pow(10, places)) / Math.pow(10, places); // truncatedNumber will be 10.78
-    }
+
     @Override
     public void addDebugInfo(List<String> info, BlockPos pos, MultiNoiseUtil.MultiNoiseSampler noiseSampler) {
         int i = BiomeCoords.fromBlock(pos.getX());
@@ -122,7 +121,7 @@ public class TerrariumBiomeSource extends BiomeSource {
                         + " Elevation: "
                         + truncate(getLocalElevation(j), 3)
                         + " Temperature: "
-                        + truncate(getTemperature(adjustedX, adjustedZ, CONFIG.zoom), 3)
+                        + truncate(getTemperature(adjustedX, adjustedZ), 3)
                         + " Noise: "
                         + truncate(getNoiseValue(i, j, k), 3)
         );

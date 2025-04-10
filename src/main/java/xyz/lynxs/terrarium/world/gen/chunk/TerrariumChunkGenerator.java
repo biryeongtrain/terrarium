@@ -39,11 +39,13 @@ import net.minecraft.world.gen.chunk.*;
 import net.minecraft.world.gen.noise.NoiseConfig;
 import xyz.lynxs.terrarium.world.gen.biome.TerrariumBiomeSource;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 import static xyz.lynxs.terrarium.Terrarium.CONFIG;
+import static xyz.lynxs.terrarium.Util.gridToLatLon;
 import static xyz.lynxs.terrarium.world.gen.HeightProvider.*;
 
 public class TerrariumChunkGenerator extends ChunkGenerator {
@@ -318,7 +320,10 @@ public class TerrariumChunkGenerator extends ChunkGenerator {
 
     @Override
     public void getDebugHudText(List<String> text, NoiseConfig noiseConfig, BlockPos pos) {
-        text.add("[Atlas CG] elevation: " + getFromMap(pos.getX(), pos.getZ()));
+        text.add(
+                "[Terrarium] Elevation: " + getFromMap(pos.getX(), pos.getZ()) +
+                        ", Cords: " + Arrays.toString(gridToLatLon(pos.getX() + CONFIG.adjustXoffset, pos.getZ() + CONFIG.adjustZoffset, size))
+        );
     }
 
     private ChunkNoiseSampler createChunkNoiseSampler(Chunk chunk, StructureAccessor world, Blender blender, NoiseConfig noiseConfig) {

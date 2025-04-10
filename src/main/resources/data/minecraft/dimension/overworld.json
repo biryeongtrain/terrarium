@@ -499,19 +499,19 @@
         {
           "biome": "minecraft:windswept_forest",
           "elevation": -0.1,
-          "temperature": 0.3,
+          "temperature": -0.3,
           "noise_weight": 0.33
         },
         {
           "biome": "minecraft:windswept_forest",
           "elevation": 0.2,
-          "temperature": 0.3,
+          "temperature": -0.3,
           "noise_weight": 0.33
         },
         {
           "biome": "minecraft:windswept_forest",
           "elevation": 0.5,
-          "temperature": 0.3,
+          "temperature": -0.3,
           "noise_weight": 0.33
         },
         {
