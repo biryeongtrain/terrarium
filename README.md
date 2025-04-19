@@ -7,7 +7,7 @@ Generate pixel-perfect worlds from real elevation data, with dynamic tile loadin
 
 ## 🌐 Terrain Data Pipeline
 - **Source**: AWS S3 (`elevation-tiles-prod/terrarium/{zoom}/{x}/{y}.png`)
-- **Temeperature** Personal Source Hosted on GitHub, I compiled this using QGIS. (`clim-monthly/{month}/{zoom}/{x}/{y}`) **This is temporary**
+- **Temeperature** Personal Source Hosted on GitHub, I compiled this using QGIS. (`clim-monthly/{month}/{zoom}/{x}/{y}`) **This is a temporary hosting solution**
 - **Pixel-to-Block**: 1 pixel = 1 Minecraft block.  
 - **Tile System**:  
   - Each tile = `256×256` pixels (`256×256` blocks ingame).  
@@ -57,5 +57,9 @@ Generate pixel-perfect worlds from real elevation data, with dynamic tile loadin
   "worldHeight": 768,       // Max Y height.
   "startingY": 0,           // Base height offset (negative for deeper oceans).
   "adjustXoffset": 400000, // Where on the map the world should generate: spawn location essentially!
-  "adjustZoffset": 800000 
+  "adjustZoffset": 800000,
+  "ELEVATION_URL": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/", //elevation data source
+  "TEMPERATURE_URL": "https://raw.githubusercontent.com/ly-nxs/terrarium-data/refs/heads/main/tiles/climate-monthly/", //climate data source
+  "CACHE_DIR": "./tiles", //tile cache dir
+  "month": 0 //month for climate data, currently only january - 0, and february - 1
 }
