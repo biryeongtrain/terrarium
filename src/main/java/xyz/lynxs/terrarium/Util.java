@@ -34,4 +34,10 @@ public class Util {
     public static long pack(int x, int z) {
         return ((long) x & 0xFFFFFFFFL) | ((long) z & 0xFFFFFFFFL) << 32;
     }
+    public static short packClimate(double precip, double temp){
+        return (short) ((short)((int)(truncate(precip, 8) * Math.pow(10, 8)) & 0xFF) | (short)((int)(truncate(temp, 8) * Math.pow(10, 8)) << 8));
+    }
+    public static double unpackClimate(short climate, boolean category){
+        return category ? (double) (climate & 0xFF) / Math.pow(10, 8) : (double) ((climate >> 8) & 0xFF) / Math.pow(10, 8);
+    }
 }

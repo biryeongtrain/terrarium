@@ -5,7 +5,6 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.noise.PerlinNoiseSampler;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.biome.Biome;
@@ -13,7 +12,7 @@ import net.minecraft.world.biome.source.BiomeCoords;
 import net.minecraft.world.biome.source.BiomeSource;
 import net.minecraft.world.biome.source.util.MultiNoiseUtil;
 import net.minecraft.world.gen.chunk.ChunkGeneratorSettings;
-import net.minecraft.world.gen.densityfunction.DensityFunction;
+import xyz.lynxs.terrarium.world.gen.HeightProvider;
 
 
 import java.util.Comparator;
@@ -22,8 +21,9 @@ import java.util.stream.Stream;
 
 import static xyz.lynxs.terrarium.Terrarium.CONFIG;
 import static xyz.lynxs.terrarium.Util.truncate;
-import static xyz.lynxs.terrarium.world.gen.BiomeProvider.getTemperature;
-import static xyz.lynxs.terrarium.world.gen.HeightProvider.*;
+import static xyz.lynxs.terrarium.Util.unpackClimate;
+import static xyz.lynxs.terrarium.world.gen.BiomeProvider.getClimate;
+
 
 public class TerrariumBiomeSource extends BiomeSource {
     private final List<BiomeEntry> biomeEntries;
@@ -51,14 +51,14 @@ public class TerrariumBiomeSource extends BiomeSource {
 
     public record BiomeEntry(
             RegistryEntry<Biome> biome,
-            double elevation,
+            double precipitation,
             double temperature,
             double noiseWeight
     ) {
         public static final Codec<BiomeEntry> CODEC = RecordCodecBuilder.create(instance ->
                 instance.group(
                         Biome.REGISTRY_CODEC.fieldOf("biome").forGetter(BiomeEntry::biome),
-                        Codec.DOUBLE.fieldOf("elevation").forGetter(BiomeEntry::elevation),
+                        Codec.DOUBLE.fieldOf("precipitation").forGetter(BiomeEntry::precipitation),
                         Codec.DOUBLE.fieldOf("temperature").forGetter(BiomeEntry::temperature),
                         Codec.DOUBLE.fieldOf("noise_weight").forGetter(BiomeEntry::noiseWeight)
                 ).apply(instance, BiomeEntry::new)
@@ -80,33 +80,39 @@ public class TerrariumBiomeSource extends BiomeSource {
     public RegistryEntry<Biome> getBiome(int x, int elevation, int z, MultiNoiseUtil.MultiNoiseSampler noise) {
         int adjustedX = x + CONFIG.adjustXoffset;
         int adjustedZ = z + CONFIG.adjustZoffset;
-        double temperature = getTemperature(adjustedX, adjustedZ);
-        temperature =  temperature > 1 ? noise.sample(x, elevation, z).temperatureNoise() : temperature;
-        double height = getLocalElevation((adjustedX < 0 || adjustedZ < 0 || adjustedX > size || adjustedZ > size) ? 0 : getElevation(adjustedX , adjustedZ));
-        double noiseValue = getNoiseValue(adjustedX, elevation, adjustedZ);
+        double precipitation = (adjustedX > 0 && adjustedZ > 0) && (adjustedX < HeightProvider.size && adjustedZ < HeightProvider.size) ? getClimate(adjustedX, adjustedZ, true) : 2;
+        double temperature = (adjustedX > 0 && adjustedZ > 0) && (adjustedX < HeightProvider.size && adjustedZ < HeightProvider.size) ?  getClimate(adjustedX, adjustedZ, true) : 2;
 
-        return findBestBiome(height, temperature, noiseValue);
+        precipitation =  precipitation > 1 ? noise.sample(x, elevation, z).humidityNoise() : precipitation;
+        temperature =  temperature > 1 ? noise.sample(x, elevation, z).temperatureNoise() : temperature;
+
+        return findBestBiome(precipitation, temperature, getNoiseValue(adjustedX, elevation, adjustedZ));
     }
+
 
     private double getNoiseValue(int x, int elevation, int z) {
-        return noiseSampler.sample(x * 0.01, elevation * 0.01, z * 0.01);
+        return noiseSampler.sample(x * CONFIG.noise_biome_scale, elevation * CONFIG.noise_biome_scale, z * CONFIG.noise_biome_scale);
     }
 
-    private RegistryEntry<Biome> findBestBiome(double height, double temperature, double noise) {
+    private RegistryEntry<Biome> findBestBiome(double precip, double temperature, double noise) {
+        if (biomeEntries.isEmpty()) {
+            throw new IllegalStateException("No biomes available!");
+        }
+
         return biomeEntries.stream()
-                .min(Comparator.comparingDouble(b ->
-                        Math.pow(b.elevation() - height, 2) * 0.7 +
-                                Math.pow(b.temperature() - temperature, 2) +
-                                Math.pow(b.noiseWeight() - noise, 2) * 0.5
-                ))
-                .orElseThrow().biome();
+                .min(Comparator.comparingDouble(b -> {
+                    // Calculate squared Euclidean distance
+                    double precipDiff = Math.pow(precip - b.precipitation(), 2);
+                    double tempDiff = Math.pow(temperature - b.temperature(), 2);
+                    double noiseDiff = Math.pow(noise - b.noiseWeight(), 2);
+                    return Math.sqrt(precipDiff + tempDiff + noiseDiff);
+                }))
+                .orElseThrow() // Should not throw if biomeEntries is not empty
+                .biome();
     }
 
 
 
-    double getLocalElevation(int y){
-        return MathHelper.clamp((y - settings.value().seaLevel()) / (double)(settings.value().generationShapeConfig().height() - settings.value().seaLevel()), -1.0, 1.0);
-    }
 
     @Override
     public void addDebugInfo(List<String> info, BlockPos pos, MultiNoiseUtil.MultiNoiseSampler noiseSampler) {
@@ -118,10 +124,10 @@ public class TerrariumBiomeSource extends BiomeSource {
 
         info.add(
                 "Biome builder PV: "
-                        + " Elevation: "
-                        + truncate(getLocalElevation(j), 3)
+                        + " Precipitation: "
+                        + truncate((adjustedX > 0 && adjustedZ > 0) && (adjustedX < HeightProvider.size && adjustedZ < HeightProvider.size) ? getClimate(adjustedX, adjustedZ, true) : -1.000, 3)
                         + " Temperature: "
-                        + truncate(getTemperature(adjustedX, adjustedZ), 3)
+                        + truncate((adjustedX > 0 && adjustedZ > 0) && (adjustedX < HeightProvider.size && adjustedZ < HeightProvider.size) ? getClimate(adjustedX, adjustedZ, false) : -1.000, 3)
                         + " Noise: "
                         + truncate(getNoiseValue(i, j, k), 3)
         );

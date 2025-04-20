@@ -91,7 +91,7 @@ public class HeightProvider {
         int xPixel = x - (xTile * 256);
         int zPixel = z - (zTile * 256);
         long key = pack(xTile,zTile);
-        if(cache.size() > 64)
+        if(cache.size() > 16)
             cache.clear();
         return cache.computeIfAbsent(key, k -> toIntHeightmap(getElevationFromHeightmap(xTile, zTile)))[xPixel][zPixel];
     }

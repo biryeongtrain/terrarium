@@ -21,17 +21,17 @@ import static xyz.lynxs.terrarium.Util.pack;
 
 public class BiomeProvider {
 
-        private static final String CACHE_DIR = "/temperature/";
+        private static final String CACHE_DIR = "/climate/";
         private static final Logger LOGGER = Terrarium.LOGGER;
-        private static final Map<Long, double[][]> cache = new ConcurrentHashMap<>();
+        private static final Map<Long, double[][][]> cache = new ConcurrentHashMap<>();
 
 
 
-        private static BufferedImage getTemperatureFromHeightmap(int xTile, int zTile, int month) {
+        private static BufferedImage getClimateFromHeightmap(int xTile, int zTile) {
 
 
-            String cachePath = CONFIG.CACHE_DIR + CACHE_DIR + month + "/" + 11 + "/" + xTile + "/" + zTile + ".png";
-            URI uri = CONFIG.TEMPERATURE_URL.resolve(month + "/" + 11 + "/" + xTile + "/" + zTile + ".png");
+            String cachePath = CONFIG.CACHE_DIR + CACHE_DIR + CONFIG.month + "/" + 8 + "/" + xTile + "/" + zTile + ".png";
+            URI uri = CONFIG.TEMPERATURE_URL.resolve(CONFIG.month + "/" + 8 + "/" + xTile + "/" + zTile + ".png");
 
             File cacheFile = new File(cachePath);
             if (cacheFile.exists()) {
@@ -47,7 +47,7 @@ public class BiomeProvider {
                         BufferedImage tileImage = ImageIO.read(inputStream);
 
                         if (tileImage == null) {
-                            throw new IOException("Failed to read image from URL: " + uri.toString());
+                            throw new IOException("Failed to read image from URL: " + uri);
                         }
 
                         Path cacheDir = Paths.get(cacheFile.getParent());
@@ -64,41 +64,44 @@ public class BiomeProvider {
                 return new BufferedImage(256, 256, BufferedImage.TYPE_INT_RGB);
         }
 
-        private static double[][] toIntHeightmap(BufferedImage image){
-            double[][] arr = new double[image.getWidth()][image.getHeight()];
-            for(int i = 0; i < image.getWidth(); i++){
-                for(int j = 0; j < image.getHeight(); j++){
-                    arr[i][j] = ((double) (new Color(image.getRGB(i, j)).getRed()) / 50) - 2;
+        private static double[][][] toIntHeightmap(BufferedImage image){
+            double[][][] arr = new double[2][image.getWidth()][image.getHeight()];
+            for(int k = 0; k < 2; k++) {
+                for (int i = 0; i < image.getWidth(); i++) {
+                    for (int j = 0; j < image.getHeight(); j++) {
+                        Color color= new Color(image.getRGB(i, j));
+                        arr[k][i][j] = (k == 0 ? ((double) color.getRed() / 64) + 1 : (double) color.getGreen() / 100) - 1;
+                    }
                 }
             }
             return arr;
         }
 
 
-    public static double getTemperature(int x, int z) {
+    public static double getClimate(int x, int z, boolean category) {
         // Convert world coordinates to temperature data coordinates
-        double scaleFactor = Math.pow(2, 11 - CONFIG.zoom);
+        double scaleFactor = Math.pow(2, 8 - CONFIG.zoom);
         int scaledX = (int)(x * scaleFactor);
         int scaledZ = (int)(z * scaleFactor);
 
         // Get base temperature values
-        double[][] tile = getTemperatureTile(scaledX / 256, scaledZ / 256);
+        double[][] tile = getClimateTile(scaledX / 256, scaledZ / 256)[category ? 0 : 1];
 
         // Bilinear interpolation for smooth transitions
         int tileX = Math.abs(scaledX % 256);
         int tileZ = Math.abs(scaledZ % 256);
 
-        return bilinearInterpolate(tile, tileX, tileZ, scaleFactor);
+        return bilinearInterpolate(tile, tileX, tileZ);
     }
 
-    private static double[][] getTemperatureTile(int xTile, int zTile) {
+    private static double[][][] getClimateTile(int xTile, int zTile) {
         long key = pack(xTile, zTile);
 
-        if (cache.size() > 64) cache.clear();
-        return cache.computeIfAbsent(key,k -> toIntHeightmap(getTemperatureFromHeightmap(xTile, zTile, 0)));
+        if (cache.size() > 32) cache.clear();
+        return cache.computeIfAbsent(key,k -> toIntHeightmap(getClimateFromHeightmap(xTile, zTile)));
     }
 
-    private static double bilinearInterpolate(double[][] tile, double x, double z, double scale) {
+    private static double bilinearInterpolate(double[][] tile, double x, double z) {
         int x1 = (int)x;
         int z1 = (int)z;
         int x2 = Math.min(x1 + 1, tile.length - 1);

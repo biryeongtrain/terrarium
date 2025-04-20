@@ -13,4 +13,5 @@ public class TerrariumConfig {
     public URI TEMPERATURE_URL = URI.create("https://raw.githubusercontent.com/ly-nxs/terrarium-data/refs/heads/main/tiles/climate-monthly/");
     public String CACHE_DIR = "./tiles";
     public int month = 0;
+    public double noise_biome_scale = 0.01;
 }
