@@ -61,5 +61,6 @@ Generate pixel-perfect worlds from real elevation data, with dynamic tile loadin
   "ELEVATION_URL": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/", //elevation data source
   "TEMPERATURE_URL": "https://raw.githubusercontent.com/ly-nxs/terrarium-data/refs/heads/main/tiles/climate-monthly/", //climate data source
   "CACHE_DIR": "./tiles", //tile cache dir
-  "month": 0 //month for climate data, currently only january - 0, and february - 1
+  "month": 0, //month for climate data, currently only january - 0, and february - 1
+  "noise_biome_scale": 0.01 //scale for biome noise factor
 }
