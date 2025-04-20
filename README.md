@@ -7,7 +7,7 @@ Generate pixel-perfect worlds from real elevation data, with dynamic tile loadin
 
 ## 🌐 Terrain Data Pipeline
 - **Source**: AWS S3 (`elevation-tiles-prod/terrarium/{zoom}/{x}/{y}.png`)
-- **Temperature** Personal Source Hosted on GitHub, I compiled this using QGIS. (`clim-monthly/{month}/{zoom}/{x}/{y}`) **This is a temporary hosting solution**
+- **Temperature and Precipitation** Personal Source Hosted on GitHub, I compiled this using QGIS. (`clim-monthly/{month}/{zoom}/{x}/{y}`) **This is a temporary hosting solution**
 - **Pixel-to-Block**: 1 pixel = 1 Minecraft block.  
 - **Tile System**:  
   - Each tile = `256×256` pixels (`256×256` blocks ingame).  
