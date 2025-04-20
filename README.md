@@ -7,7 +7,7 @@ Generate pixel-perfect worlds from real elevation data, with dynamic tile loadin
 
 ## 🌐 Terrain Data Pipeline
 - **Source**: AWS S3 (`elevation-tiles-prod/terrarium/{zoom}/{x}/{y}.png`)
-- **Temeperature** Personal Source Hosted on GitHub, I compiled this using QGIS. (`clim-monthly/{month}/{zoom}/{x}/{y}`)
+- **Temperature** Personal Source Hosted on GitHub, I compiled this using QGIS. (`clim-monthly/{month}/{zoom}/{x}/{y}`) **This is a temporary hosting solution**
 - **Pixel-to-Block**: 1 pixel = 1 Minecraft block.  
 - **Tile System**:  
   - Each tile = `256×256` pixels (`256×256` blocks ingame).  
@@ -33,29 +33,17 @@ Generate pixel-perfect worlds from real elevation data, with dynamic tile loadin
 ### World Size Comparison
 - zoom: 10 (small - ~1:48) vs. zoom: 13 (planetary-scale - ~1:6).
 ### 🖼️ Screenshots:
-- Taken with v0.0.1-alpha.4
-**Zoom: 11 | Height 512**
 
----
-
-![2025-03-25_18 19 55](https://github.com/user-attachments/assets/37395fcc-af8a-4820-a509-c42f8bb4f2ae)
-
-**Zoom: 12 | Height 512**
-
----
-
-![2025-03-27_16 19 16](https://github.com/user-attachments/assets/bb86d657-94ea-4a5d-8362-e8f2cb41973f)
-![2025-03-28_07 52 57](https://github.com/user-attachments/assets/81023cbc-3e84-4095-b39b-7e536f4c494b)
+- Taken with v0.0.2-beta.1 + Conquest Reforged + Photon/UShader
 
 **Zoom: 13 | Height 768**
 
 ---
-
-![2025-03-28_15 59 45](https://github.com/user-attachments/assets/840424dd-6c90-4049-b2da-cc862ed5b853)
-![2025-03-28_15 37 18](https://github.com/user-attachments/assets/45c44fd1-1eb3-4b3c-b9ca-2439bf6d53be)
+![2025-04-10_21 09 04](https://github.com/user-attachments/assets/4e0a9457-8c38-4ad0-b42a-ed6bfe8eaa2a)
+![2025-04-10_21 24 04](https://github.com/user-attachments/assets/993261b0-c90d-49b9-bdf3-25490cd9e072)
+![2025-04-10_21 25 46](https://github.com/user-attachments/assets/4e1b4750-0589-4ce5-aae1-514ee7a88f21)
 
 ---
-
 ## 🛠️ How It Works
 - Tile Fetching: Downloads 256×256 PNG tiles from AWS based on zoom and caches.
 - Height Mapping: Converts RGB pixels to block heights, scaled by additionalAlt.
@@ -69,5 +57,9 @@ Generate pixel-perfect worlds from real elevation data, with dynamic tile loadin
   "worldHeight": 768,       // Max Y height.
   "startingY": 0,           // Base height offset (negative for deeper oceans).
   "adjustXoffset": 400000, // Where on the map the world should generate: spawn location essentially!
-  "adjustZoffset": 800000 
+  "adjustZoffset": 800000,
+  "ELEVATION_URL": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/", //elevation data source
+  "TEMPERATURE_URL": "https://raw.githubusercontent.com/ly-nxs/terrarium-data/refs/heads/main/tiles/climate-monthly/", //climate data source
+  "CACHE_DIR": "./tiles", //tile cache dir
+  "month": 0 //month for climate data, currently only january - 0, and february - 1
 }
