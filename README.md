@@ -34,14 +34,15 @@ Generate pixel-perfect worlds from real elevation data, with dynamic tile loadin
 - zoom: 10 (small - ~1:48) vs. zoom: 13 (planetary-scale - ~1:6).
 ### 🖼️ Screenshots:
 
-- Taken with v0.0.2-beta.1 + Conquest Reforged + Photon/UShader
+- Taken with v0.0.2-beta.2 + Bliss/Photon
 
 **Zoom: 13 | Height 768**
 
 ---
-![2025-04-10_21 09 04](https://github.com/user-attachments/assets/4e0a9457-8c38-4ad0-b42a-ed6bfe8eaa2a)
-![2025-04-10_21 24 04](https://github.com/user-attachments/assets/993261b0-c90d-49b9-bdf3-25490cd9e072)
-![2025-04-10_21 25 46](https://github.com/user-attachments/assets/4e1b4750-0589-4ce5-aae1-514ee7a88f21)
+![2025-04-20_17 58 57](https://github.com/user-attachments/assets/77465cca-cd72-4c7f-95ac-47b6e18b9804)
+![2025-04-20_11 15 43](https://github.com/user-attachments/assets/7e331e0b-4763-4a60-8a79-dacce193363e)
+![2025-04-20_11 15 26](https://github.com/user-attachments/assets/003d848f-57a5-4cd0-ae9e-36180ea089a0)
+
 
 ---
 ## 🛠️ How It Works
