@@ -2,6 +2,7 @@
 **Pixel-Perfect Earth Terrain for Minecraft**  
 
 Generate pixel-perfect worlds from real elevation data, with dynamic tile loading and customizable terrain shaping.  
+- World type is `terrarium:terrarium` for servers, singleplayer, select earth when creating world and choose customize to change settings per world.
 
 ---
 
@@ -17,9 +18,9 @@ Generate pixel-perfect worlds from real elevation data, with dynamic tile loadin
 ---
 
 ## 🗃️ Downloads
-- While it is still at Alpha quality, you can download indev test versions [here](https://nightly.link/ly-nxs/terrarium/workflows/build/1.21-World/Artifacts)
-- Support is not guarunteed
-- BlossomLib is required, and FabricAPI
+- You can download indev test versions [here](https://nightly.link/ly-nxs/terrarium/workflows/build/1.21-World/Artifacts)
+- Support is not garunteed for thos, only alphas, betas, and releases
+- FabricAPI is required
 ---
 
 ## 🏔️ Technical Notes
@@ -51,17 +52,12 @@ Generate pixel-perfect worlds from real elevation data, with dynamic tile loadin
 - Biome Placement: Vanilla biomes mapped using elevation (startingY + altitudeDropoff).
 
 ## 🔧 **Configuration**  
+![image](https://github.com/user-attachments/assets/14d2257e-59a9-4518-846e-d3220470d991)
+
 `/config/BlossomMods/Terrarium.json`:  
 ```json
 {   
-  "zoom": 13,   // 2¹³ tiles = 8,192 tiles wide (≈2M blocks at 256px/tile).
-  "worldHeight": 768,       // Max Y height.
-  "startingY": 0,           // Base height offset (negative for deeper oceans).
-  "adjustXoffset": 400000, // Where on the map the world should generate: spawn location essentially!
-  "adjustZoffset": 800000,
   "ELEVATION_URL": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/", //elevation data source
   "TEMPERATURE_URL": "https://raw.githubusercontent.com/ly-nxs/terrarium-data/refs/heads/main/tiles/climate-monthly/", //climate data source
   "CACHE_DIR": "./tiles", //tile cache dir
-  "month": 0, //month for climate data, currently only january - 0, and february - 1
-  "noise_biome_scale": 0.01 //scale for biome noise factor
 }
