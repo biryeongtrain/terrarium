@@ -19,7 +19,7 @@ Generate pixel-perfect worlds from real elevation data, with dynamic tile loadin
 
 ## 🗃️ Downloads
 - You can download indev test versions [here](https://nightly.link/ly-nxs/terrarium/workflows/build/1.21-World/Artifacts)
-- Support is not garunteed for thos, only alphas, betas, and releases
+- Support is not guarunteed for those, only alphas, betas, and releases
 - FabricAPI is required
 ---
 
