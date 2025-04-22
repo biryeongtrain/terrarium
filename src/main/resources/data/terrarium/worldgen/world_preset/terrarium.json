@@ -1,9 +1,12 @@
 {
-  "type": "minecraft:overworld",
-  "generator": {
+  "dimensions": {
+    "minecraft:overworld": {
+      "type": "minecraft:overworld",
+      "generator": {
     "type": "terrarium:chunk_generator",
     "biome_source": {
       "type": "terrarium:biome_source",
+      "noise_scale": 0.001,
       "biomes": [
         {
           "biome": "minecraft:swamp",
@@ -169,7 +172,7 @@
         },
         {
           "biome": "minecraft:cherry_grove",
-          "precipitation": 0.5,
+          "precipitation": 0.75,
           "temperature": 0.25,
           "noise_weight": -0.5
         },
@@ -206,6 +209,29 @@
       ],
       "settings": "minecraft:overworld"
     },
-    "settings": "minecraft:overworld"
+        "settings": "minecraft:overworld"
+      }
+    },
+    "minecraft:the_end": {
+      "type": "minecraft:the_end",
+      "generator": {
+        "type": "minecraft:noise",
+        "biome_source": {
+          "type": "minecraft:the_end"
+        },
+        "settings": "minecraft:end"
+      }
+    },
+    "minecraft:the_nether": {
+      "type": "minecraft:the_nether",
+      "generator": {
+        "type": "minecraft:noise",
+        "biome_source": {
+          "type": "minecraft:multi_noise",
+          "preset": "minecraft:nether"
+        },
+        "settings": "minecraft:nether"
+      }
+    }
   }
 }

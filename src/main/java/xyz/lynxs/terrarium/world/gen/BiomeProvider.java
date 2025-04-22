@@ -17,21 +17,21 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static xyz.lynxs.terrarium.Terrarium.CONFIG;
+import static xyz.lynxs.terrarium.Terrarium.CONFIG1;
 import static xyz.lynxs.terrarium.Util.pack;
 
 public class BiomeProvider {
 
         private static final String CACHE_DIR = "/climate/";
         private static final Logger LOGGER = Terrarium.LOGGER;
-        private static final Map<Long, double[][][]> cache = new ConcurrentHashMap<>();
-
+        private static final Map<Long, double[][][]> biomeMap= new ConcurrentHashMap<>();
 
 
         private static BufferedImage getClimateFromHeightmap(int xTile, int zTile) {
 
 
-            String cachePath = CONFIG.CACHE_DIR + CACHE_DIR + CONFIG.month + "/" + 8 + "/" + xTile + "/" + zTile + ".png";
-            URI uri = CONFIG.TEMPERATURE_URL.resolve(CONFIG.month + "/" + 8 + "/" + xTile + "/" + zTile + ".png");
+            String cachePath = CONFIG1.CACHE_DIR + CACHE_DIR + CONFIG.month + "/" + 8 + "/" + xTile + "/" + zTile + ".png";
+            URI uri = CONFIG1.TEMPERATURE_URL.resolve(CONFIG.month + "/" + 8 + "/" + xTile + "/" + zTile + ".png");
 
             File cacheFile = new File(cachePath);
             if (cacheFile.exists()) {
@@ -64,42 +64,36 @@ public class BiomeProvider {
                 return new BufferedImage(256, 256, BufferedImage.TYPE_INT_RGB);
         }
 
-        private static double[][][] toIntHeightmap(BufferedImage image){
+        private static double[][][] toIntHeightmap(BufferedImage image, boolean type){
             double[][][] arr = new double[2][image.getWidth()][image.getHeight()];
-            for(int k = 0; k < 2; k++) {
+                int k = type ? 0 : 1;
                 for (int i = 0; i < image.getWidth(); i++) {
                     for (int j = 0; j < image.getHeight(); j++) {
                         Color color= new Color(image.getRGB(i, j));
-                        arr[k][i][j] = (k == 0 ? ((double) color.getRed() / 64) + 1 : (double) color.getGreen() / 100) - 1;
+                        arr[k][i][j] = (type ? ((double) color.getRed() / 64) + 1 : (double) color.getGreen() / 100) - 1;
                     }
                 }
-            }
+
             return arr;
         }
 
 
     public static double getClimate(int x, int z, boolean category) {
+        if(biomeMap.size() > 4 ) biomeMap.clear();
         // Convert world coordinates to temperature data coordinates
         double scaleFactor = Math.pow(2, 8 - CONFIG.zoom);
         int scaledX = (int)(x * scaleFactor);
         int scaledZ = (int)(z * scaleFactor);
-
+        int Xtile = scaledX/256;
+        int Ztile = scaledZ/256;
         // Get base temperature values
-        double[][] tile = getClimateTile(scaledX / 256, scaledZ / 256)[category ? 0 : 1];
-
         // Bilinear interpolation for smooth transitions
         int tileX = Math.abs(scaledX % 256);
         int tileZ = Math.abs(scaledZ % 256);
 
-        return bilinearInterpolate(tile, tileX, tileZ);
+        return bilinearInterpolate(biomeMap.computeIfAbsent(pack(Xtile, Ztile), k -> toIntHeightmap(getClimateFromHeightmap(Xtile, Ztile), category))[category ? 0 : 1], tileX, tileZ);
     }
 
-    private static double[][][] getClimateTile(int xTile, int zTile) {
-        long key = pack(xTile, zTile);
-
-        if (cache.size() > 32) cache.clear();
-        return cache.computeIfAbsent(key,k -> toIntHeightmap(getClimateFromHeightmap(xTile, zTile)));
-    }
 
     private static double bilinearInterpolate(double[][] tile, double x, double z) {
         int x1 = (int)x;

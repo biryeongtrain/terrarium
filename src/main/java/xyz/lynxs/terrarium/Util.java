@@ -4,7 +4,6 @@ package xyz.lynxs.terrarium;
 public class Util {
     private static final double EARTH_RADIUS = 6378137.0; // Standard Mercator Earth radius (meters)
     private static final double MAX_MERCATOR = EARTH_RADIUS * Math.PI; // ~20,037,508 meters
-
     /**
      * Convert integer X/Z in a variable-sized grid to latitude/longitude.
      * @param x X coordinate (integer, 0 to maxSize-1)
@@ -28,16 +27,9 @@ public class Util {
         return  (int)(num * Math.pow(10, places)) / Math.pow(10, places); // truncatedNumber will be 10.78
     }
 
-    public static int lon2tile(long lon,int zoom) { return (int) Math.floor((double) (lon + 180) /360*Math.pow(2,zoom)); }
-    public static int  lat2tile(long lat,int zoom)  { return (int) Math.floor((1-Math.log(Math.tan(lat*Math.PI/180) + 1/Math.cos(lat*Math.PI/180))/Math.PI)/2 *Math.pow(2,zoom)); }
 
     public static long pack(int x, int z) {
         return ((long) x & 0xFFFFFFFFL) | ((long) z & 0xFFFFFFFFL) << 32;
     }
-    public static short packClimate(double precip, double temp){
-        return (short) ((short)((int)(truncate(precip, 8) * Math.pow(10, 8)) & 0xFF) | (short)((int)(truncate(temp, 8) * Math.pow(10, 8)) << 8));
-    }
-    public static double unpackClimate(short climate, boolean category){
-        return category ? (double) (climate & 0xFF) / Math.pow(10, 8) : (double) ((climate >> 8) & 0xFF) / Math.pow(10, 8);
-    }
+
 }

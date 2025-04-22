@@ -1,15 +1,18 @@
 {
-    "required": false,
-    "minVersion": "0.8",
-    "package": "xyz.lynxs.terrarium.mixin",
-    "compatibilityLevel": "JAVA_21",
-    "mixins": [
-        "MaterialRuleContextAccessor",
-        "RegistryElementCodecAccessor",
-        "SurfaceBuilderMixin",
-        "ThreadedAnvilChunkStorageMixin"
-    ],
-    "injectors": {
-        "defaultRequire": 1
-    }
+  "required": false,
+  "minVersion": "0.8",
+  "package": "xyz.lynxs.terrarium.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "MaterialRuleContextAccessor",
+    "RegistryElementCodecAccessor",
+    "SurfaceBuilderMixin",
+    "ThreadedAnvilChunkStorageMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "client": [
+    "LevelSelectorMixin"
+  ]
 }

@@ -21,7 +21,6 @@ import java.util.stream.Stream;
 
 import static xyz.lynxs.terrarium.Terrarium.CONFIG;
 import static xyz.lynxs.terrarium.Util.truncate;
-import static xyz.lynxs.terrarium.Util.unpackClimate;
 import static xyz.lynxs.terrarium.world.gen.BiomeProvider.getClimate;
 
 
@@ -29,23 +28,26 @@ public class TerrariumBiomeSource extends BiomeSource {
     private final List<BiomeEntry> biomeEntries;
     private final PerlinNoiseSampler noiseSampler;
     private final RegistryEntry<ChunkGeneratorSettings> settings;
+    private final Double noiseScales;
 
 
     public static final MapCodec<TerrariumBiomeSource> CODEC = RecordCodecBuilder.mapCodec(instance ->
             instance.group(
                     BiomeEntry.CODEC.listOf().fieldOf("biomes").forGetter(source -> source.biomeEntries),
-                    ChunkGeneratorSettings.REGISTRY_CODEC.fieldOf("settings").forGetter(source -> source.settings)
+                    ChunkGeneratorSettings.REGISTRY_CODEC.fieldOf("settings").forGetter(source -> source.settings),
+                    Codec.DOUBLE.fieldOf("noise_scale").forGetter(source -> source.noiseScales)
             ).apply(instance, TerrariumBiomeSource::new)
     );
 
-    public TerrariumBiomeSource(List<BiomeEntry> biomeEntries, RegistryEntry<ChunkGeneratorSettings> settings ) {
-        this(biomeEntries, Random.create(), settings);
+    public TerrariumBiomeSource(List<BiomeEntry> biomeEntries, RegistryEntry<ChunkGeneratorSettings> settings, Double noiseScales ) {
+        this(biomeEntries, Random.create(), settings, noiseScales);
     }
 
-    public TerrariumBiomeSource(List<BiomeEntry> biomeEntries, Random random, RegistryEntry<ChunkGeneratorSettings> settings) {
+    public TerrariumBiomeSource(List<BiomeEntry> biomeEntries, Random random, RegistryEntry<ChunkGeneratorSettings> settings, Double noiseScales) {
         this.biomeEntries = biomeEntries;
         this.noiseSampler = new PerlinNoiseSampler(random);
         this.settings = settings;
+        this.noiseScales = noiseScales;
     }
 
 

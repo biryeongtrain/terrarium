@@ -1,17 +1,78 @@
 package xyz.lynxs.terrarium;
 
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import net.fabricmc.loader.api.FabricLoader;
+import org.jetbrains.annotations.NotNull;
+
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 
+
 public class TerrariumConfig {
-    public int zoom = 11;
-    public int worldHeight = 512;
-    public int startingY = 64;
-    public int adjustXoffset = 100000;
-    public int adjustZoffset = 200000;
     public URI ELEVATION_URL = URI.create("https://s3.amazonaws.com/elevation-tiles-prod/terrarium/");
     public URI TEMPERATURE_URL = URI.create("https://raw.githubusercontent.com/ly-nxs/terrarium-data/refs/heads/main/tiles/climate-monthly/");
     public String CACHE_DIR = "./tiles";
-    public int month = 0;
-    public double noise_biome_scale = 0.01;
+
+
+    private static final Gson GSON = new GsonBuilder()
+            .setPrettyPrinting()
+            .serializeNulls()
+            .disableHtmlEscaping()
+            .create();
+
+    private static File getFile(String filename, boolean type, String worldDir) {
+        return type ? FabricLoader.getInstance().getConfigDir().resolve(filename).toFile() : new File(worldDir);
+    }
+
+    public static <T> @NotNull T load(Class<T> clazz, String filename) {
+
+        var file = getFile(filename, true, null);
+        T config = null;
+
+        if (file.exists()) {
+            try (var reader = new BufferedReader(
+                    new InputStreamReader(
+                            new FileInputStream(file)
+                    )
+            )) {
+                config = GSON.fromJson(reader, clazz);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (config == null) {
+            try {
+                config = clazz.getDeclaredConstructor().newInstance();
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                     NoSuchMethodException e) {
+                e.printStackTrace();
+                System.exit(1);
+            }
+        }
+
+        TerrariumConfig.save(config,  filename, true);
+        return config;
+    }
+
+    public static <T> void save(T config, String filename, boolean type) {
+
+        File file = getFile(filename, type, filename);
+        if (!file.getParentFile().exists()) {
+            if (!file.getParentFile().mkdir()) {
+                System.err.println("Failed to create a directory for " + file);
+            }
+        }
+
+        try (var writer = new OutputStreamWriter(
+                new FileOutputStream(file)
+        )) {
+            GSON.toJson(config, writer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
