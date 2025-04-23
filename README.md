@@ -35,7 +35,7 @@ Generate pixel-perfect worlds from real elevation data, with dynamic tile loadin
 - zoom: 10 (small - ~1:48) vs. zoom: 13 (planetary-scale - ~1:6).
 ### 🖼️ Screenshots:
 
-- Taken with v0.0.2-beta.2 + Bliss/Photon
+- Taken with v0.0.2-beta.2 + Bliss/Photon + WWOO
 
 **Zoom: 13 | Height 768**
 
