@@ -19,7 +19,7 @@ Generate pixel-perfect worlds from real elevation data, with dynamic tile loadin
 
 ## 🗃️ Downloads
 - You can download indev test versions [here](https://nightly.link/ly-nxs/terrarium/workflows/build/1.21-World/Artifacts)
-- Support is not garunteed for thos, only alphas, betas, and releases
+- Support is not guarunteed for those, only alphas, betas, and releases
 - FabricAPI is required
 ---
 
@@ -35,7 +35,7 @@ Generate pixel-perfect worlds from real elevation data, with dynamic tile loadin
 - zoom: 10 (small - ~1:48) vs. zoom: 13 (planetary-scale - ~1:6).
 ### 🖼️ Screenshots:
 
-- Taken with v0.0.2-beta.2 + Bliss/Photon
+- Taken with v0.0.2-beta.2 + Bliss/Photon + WWOO
 
 **Zoom: 13 | Height 768**
 
