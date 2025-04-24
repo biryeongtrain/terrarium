@@ -32,7 +32,7 @@ import static xyz.lynxs.terrarium.world.gen.HeightProvider.init;
 public class Terrarium implements ModInitializer {
     public static final String MOD_ID = "terrarium";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-    public static presetConfig CONFIG = new presetConfig(13, 768, 64, 400000, 800000, 2, 0.01);
+    public static presetConfig CONFIG = new presetConfig();
     public  static TerrariumConfig CONFIG1 = ConfigManager.register(TerrariumConfig.class, "Terrarium.json", newConfig -> CONFIG1 = newConfig);
     public static Identifier id(String path) {
         return Identifier.of(MOD_ID, path);
@@ -46,10 +46,9 @@ public class Terrarium implements ModInitializer {
                     .getKey(world.getDimension())
                     .orElseThrow(() -> new IllegalStateException("Unknown dimension type"));
 
-            if (dimensionKey.getValue().equals(id("terrarium"))) {
-                CONFIG = load(CONFIG.getClass(), server.getSavePath(WorldSavePath.ROOT).resolve("terrarium.json").toString());
+            if (dimensionKey.getValue().equals(Identifier.ofVanilla("overworld"))){
+                CONFIG = load(CONFIG.getClass(), server.getSavePath(WorldSavePath.ROOT).resolve("terrarium.json").normalize().toString(), false);
                 init();
-                TerrariumRegistries.register();
             }
         }
         catch (Exception e) {LOGGER.error(e.getMessage());}
@@ -75,7 +74,7 @@ public class Terrarium implements ModInitializer {
         );
 
         ServerWorldEvents.LOAD.register(Terrarium::onServerWorldLoad);
-
+        TerrariumRegistries.register(); // this must be executed in bootstrap.
     }
 
 

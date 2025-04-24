@@ -14,7 +14,7 @@ public class ConfigManager {
 
     public static <T> T register(Class<T> clazz, String filename, Consumer<T> apply) {
         configs.add(new Config<>(clazz, apply, filename));
-        return TerrariumConfig.load(clazz, filename);
+        return TerrariumConfig.load(clazz, filename, true);
     }
 
 }
