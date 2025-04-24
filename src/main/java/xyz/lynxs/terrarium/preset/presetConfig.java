@@ -9,6 +9,10 @@ public class presetConfig {
     public int month;
     public double noise_biome_scale;
 
+    public presetConfig() {
+        this(13, 768, 64, 400000, 800000, 2, 0.01);
+    }
+
     public presetConfig(int zoom, int worldHeight, int startingY, int adjustXoffset, int adjustZoffset, int month, double noise_biome_scale){
         this.adjustXoffset = adjustXoffset;
         this.zoom = zoom;
