@@ -36,7 +36,7 @@
           "biome": "minecraft:plains",
           "precipitation": 0.25,
           "temperature": 0.5,
-          "noise_weight": 0.5
+          "noise_weight": 0.0
         },
         {
           "biome": "minecraft:forest",
@@ -90,7 +90,7 @@
           "biome": "minecraft:badlands",
           "precipitation": 0.0,
           "temperature": 0.75,
-          "noise_weight": 0.0
+          "noise_weight": 0.5
         },
         {
           "biome": "minecraft:wooded_badlands",
@@ -102,7 +102,7 @@
           "biome": "minecraft:desert",
           "precipitation": 0.0,
           "temperature": 0.75,
-          "noise_weight": 0.0
+          "noise_weight": -0.5
         },
         {
           "biome": "minecraft:windswept_savanna",

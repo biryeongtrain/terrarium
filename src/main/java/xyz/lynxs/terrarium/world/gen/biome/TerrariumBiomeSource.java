@@ -60,7 +60,7 @@ public class TerrariumBiomeSource extends BiomeSource {
         public static final Codec<BiomeEntry> CODEC = RecordCodecBuilder.create(instance ->
                 instance.group(
                         Biome.REGISTRY_CODEC.fieldOf("biome").forGetter(BiomeEntry::biome),
-                        Codec.DOUBLE.fieldOf("precipitation").forGetter(BiomeEntry::precipitation),
+                        Codec.DOUBLE.fieldOf("precipitation").forGetter(BiomeEntry::precipitation) ,
                         Codec.DOUBLE.fieldOf("temperature").forGetter(BiomeEntry::temperature),
                         Codec.DOUBLE.fieldOf("noise_weight").forGetter(BiomeEntry::noiseWeight)
                 ).apply(instance, BiomeEntry::new)
@@ -83,7 +83,7 @@ public class TerrariumBiomeSource extends BiomeSource {
         int adjustedX = x + CONFIG.adjustXoffset;
         int adjustedZ = z + CONFIG.adjustZoffset;
         double precipitation = (adjustedX > 0 && adjustedZ > 0) && (adjustedX < HeightProvider.size && adjustedZ < HeightProvider.size) ? getClimate(adjustedX, adjustedZ, true) : 2;
-        double temperature = (adjustedX > 0 && adjustedZ > 0) && (adjustedX < HeightProvider.size && adjustedZ < HeightProvider.size) ?  getClimate(adjustedX, adjustedZ, true) : 2;
+        double temperature = (adjustedX > 0 && adjustedZ > 0) && (adjustedX < HeightProvider.size && adjustedZ < HeightProvider.size) ?  getClimate(adjustedX, adjustedZ, false) : 2;
 
         precipitation =  precipitation > 1 ? noise.sample(x, elevation, z).humidityNoise() : precipitation;
         temperature =  temperature > 1 ? noise.sample(x, elevation, z).temperatureNoise() : temperature;
@@ -104,8 +104,8 @@ public class TerrariumBiomeSource extends BiomeSource {
         return biomeEntries.stream()
                 .min(Comparator.comparingDouble(b -> {
                     // Calculate squared Euclidean distance
-                    double precipDiff = Math.pow(precip - b.precipitation(), 2);
-                    double tempDiff = Math.pow(temperature - b.temperature(), 2);
+                    double precipDiff = Math.pow(precip - b.precipitation(), 2) * 0.5;
+                    double tempDiff = Math.pow(temperature - b.temperature(), 2) ;
                     double noiseDiff = Math.pow(noise - b.noiseWeight(), 2);
                     return Math.sqrt(precipDiff + tempDiff + noiseDiff);
                 }))

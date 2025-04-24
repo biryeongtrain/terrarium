@@ -2,9 +2,12 @@ package xyz.lynxs.terrarium;
 
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.WorldSavePath;
+import net.minecraft.world.dimension.DimensionType;
 import xyz.lynxs.terrarium.preset.presetConfig;
 import xyz.lynxs.terrarium.world.gen.TerrariumRegistries;
 import xyz.lynxs.terrarium.world.gen.biome.TerrariumBiomeSource;
@@ -37,19 +40,26 @@ public class Terrarium implements ModInitializer {
 
     // Server-side world load
     public static void onServerWorldLoad(MinecraftServer server, ServerWorld world) {
-        try{
-        CONFIG = load(CONFIG.getClass(), server.getSavePath(WorldSavePath.ROOT).resolve("terrarium.json").toString());}
-        catch (Exception e){
-            LOGGER.error(e.getMessage());
+        try {
+            RegistryKey<DimensionType> dimensionKey = world.getRegistryManager()
+                    .get(RegistryKeys.DIMENSION_TYPE)
+                    .getKey(world.getDimension())
+                    .orElseThrow(() -> new IllegalStateException("Unknown dimension type"));
+
+            if (dimensionKey.getValue().equals(id("terrarium"))) {
+                CONFIG = load(CONFIG.getClass(), server.getSavePath(WorldSavePath.ROOT).resolve("terrarium.json").toString());
+                init();
+                TerrariumRegistries.register();
+            }
         }
-        init();
+        catch (Exception e) {LOGGER.error(e.getMessage());}
+
     }
+
 
     @Override
     public void onInitialize() {
         LOGGER.info("Terrarium Loaded");
-        //register surface rules
-        TerrariumRegistries.register();
         // Register custom chunk generator
         Registry.register(
                 Registries.BIOME_SOURCE,

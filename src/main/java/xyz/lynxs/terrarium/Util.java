@@ -31,5 +31,14 @@ public class Util {
     public static long pack(int x, int z) {
         return ((long) x & 0xFFFFFFFFL) | ((long) z & 0xFFFFFFFFL) << 32;
     }
+    public static short[][] getSubArraySystemCopy(short[][] source, int x1, int y1, int x2, int y2) {
+        int width = x2 - x1;
+        int height = y2 - y1;
+        short[][] result = new short[height][width];
 
+        for (int i = 0; i < height; i++) {
+            System.arraycopy(source[y1 + i], x1, result[i], 0, width);
+        }
+        return result;
+    }
 }

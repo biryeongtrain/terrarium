@@ -1,7 +1,6 @@
 package xyz.lynxs.terrarium.world.gen;
 
 
-import org.jctools.maps.NonBlockingHashMapLong;
 import xyz.lynxs.terrarium.Terrarium;
 import org.slf4j.Logger;
 
@@ -15,6 +14,8 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static xyz.lynxs.terrarium.Terrarium.CONFIG;
 import static xyz.lynxs.terrarium.Terrarium.CONFIG1;
@@ -25,7 +26,7 @@ public class HeightProvider {
     private static final String CACHE_DIR = "/elevation/";
     private static final Logger LOGGER = Terrarium.LOGGER;
     public static int size = (int) (256 * Math.pow(2, CONFIG.zoom));
-    private static final NonBlockingHashMapLong<int[][]> elevMap = new NonBlockingHashMapLong<>();
+    private static final Map<Long, short[][]> elevMap = new ConcurrentHashMap<>();
 
     public static void init(){
         size = (int) (256 * Math.pow(2, CONFIG.zoom));
@@ -69,14 +70,14 @@ public class HeightProvider {
     }
 
 
-    private static int[][] toIntHeightmap(BufferedImage image){
-        int[][] arr = new int[image.getWidth()][image.getHeight()];
+    private static short[][] toIntHeightmap(BufferedImage image){
+        short[][] arr = new short[image.getWidth()][image.getHeight()];
         for(int i = 0; i < image.getWidth(); i++){
             for(int j = 0; j < image.getHeight(); j++){
 
                 Color rgb = new Color(image.getRGB(i, j));
                 double elevation = (rgb.getRed() * 256 + rgb.getGreen() + rgb.getBlue() / 256.0) - 32768;
-                arr[i][j] = (int) ((elevation / 8850) * CONFIG.worldHeight);
+                arr[i][j] = (short) ((elevation / 8850) * CONFIG.worldHeight);
 
             }
         }
@@ -84,13 +85,12 @@ public class HeightProvider {
     }
 
 
-    public static int getElevation(int x, int z) {
-        if(elevMap.size() > 4 ) elevMap.clear();
+    public static short getElevation(int x, int z) {
+        if(elevMap.size() > 32) elevMap.clear();
         int xTile = x / 256;
         int zTile = z / 256;
         int xPixel = x - (xTile * 256);
         int zPixel = z - (zTile * 256);
-
         return elevMap.computeIfAbsent(pack(xTile, zTile), k -> toIntHeightmap(getElevationFromHeightmap(xTile, zTile)))[xPixel][zPixel];
     }
 }

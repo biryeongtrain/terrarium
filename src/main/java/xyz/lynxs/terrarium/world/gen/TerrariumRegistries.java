@@ -13,6 +13,7 @@ import static xyz.lynxs.terrarium.world.gen.HeightProvider.getElevation;
 
 
 public class TerrariumRegistries {
+
     public static void register() {
         Registry.register(Registries.MATERIAL_CONDITION, Identifier.of("minecraft", "above_preliminary_surface"), AboveSurfaceMaterialCondition.CODEC.codec());
     }

@@ -198,6 +198,7 @@ public class TerrariumChunkGenerator extends ChunkGenerator {
         int m = 16 / k;
         int n = 16 / k;
 
+
         BlockState defaultFluid = this.settings.value().defaultFluid();
         for (int o = 0; o < m; ++o) {
             chunkNoiseSampler.sampleEndDensity(o);
@@ -222,6 +223,7 @@ public class TerrariumChunkGenerator extends ChunkGenerator {
                             double e = (double) v / (double) k;
                             chunkNoiseSampler.interpolateX(w, e);
                             for (int y = 0; y < k; ++y) {
+
                                 int z = j + p * k + y;
                                 int aa = z & 0xF;
                                 double f = (double) y / (double) k;
@@ -229,9 +231,10 @@ public class TerrariumChunkGenerator extends ChunkGenerator {
                                 int blockX = chunkNoiseSampler.blockX();
                                 int blockY = chunkNoiseSampler.blockY();
                                 int blockZ = chunkNoiseSampler.blockZ();
+
                                 mutable.set(blockX, blockY, blockZ);
                                 int seaLevel = this.getSeaLevel(blockX, blockZ);
-                                int elevation = this.getFromMap(blockX, blockZ);
+                                int elevation = getFromMap(blockX, blockZ);
 
                                 BlockState state;
                                 if (elevation - blockY <= 10) {

@@ -24,7 +24,7 @@ public class BiomeProvider {
 
         private static final String CACHE_DIR = "/climate/";
         private static final Logger LOGGER = Terrarium.LOGGER;
-        private static final Map<Long, double[][][]> biomeMap= new ConcurrentHashMap<>();
+        private static final Map<Long, short[][][]> biomeMap= new ConcurrentHashMap<>();
 
 
         private static BufferedImage getClimateFromHeightmap(int xTile, int zTile) {
@@ -64,22 +64,22 @@ public class BiomeProvider {
                 return new BufferedImage(256, 256, BufferedImage.TYPE_INT_RGB);
         }
 
-        private static double[][][] toIntHeightmap(BufferedImage image, boolean type){
-            double[][][] arr = new double[2][image.getWidth()][image.getHeight()];
-                int k = type ? 0 : 1;
-                for (int i = 0; i < image.getWidth(); i++) {
-                    for (int j = 0; j < image.getHeight(); j++) {
-                        Color color= new Color(image.getRGB(i, j));
-                        arr[k][i][j] = (type ? ((double) color.getRed() / 64) + 1 : (double) color.getGreen() / 100) - 1;
+        private static short[][][] toIntHeightmap(BufferedImage image){
+            short[][][] arr = new short[2][image.getWidth()][image.getHeight()];
+                for(int k = 0; k < arr.length; k++) {
+                    for (int i = 0; i < image.getWidth(); i++) {
+                        for (int j = 0; j < image.getHeight(); j++) {
+                            Color color = new Color(image.getRGB(i, j));
+                            arr[k][i][j] = (short) (k == 0 ? color.getRed() : color.getGreen());
+                        }
                     }
                 }
-
             return arr;
         }
 
 
     public static double getClimate(int x, int z, boolean category) {
-        if(biomeMap.size() > 4 ) biomeMap.clear();
+        if(biomeMap.size() > 16) biomeMap.clear();
         // Convert world coordinates to temperature data coordinates
         double scaleFactor = Math.pow(2, 8 - CONFIG.zoom);
         int scaledX = (int)(x * scaleFactor);
@@ -91,11 +91,11 @@ public class BiomeProvider {
         int tileX = Math.abs(scaledX % 256);
         int tileZ = Math.abs(scaledZ % 256);
 
-        return bilinearInterpolate(biomeMap.computeIfAbsent(pack(Xtile, Ztile), k -> toIntHeightmap(getClimateFromHeightmap(Xtile, Ztile), category))[category ? 0 : 1], tileX, tileZ);
+        return (bilinearInterpolate(biomeMap.computeIfAbsent(pack(Xtile, Ztile), k -> toIntHeightmap(getClimateFromHeightmap(Xtile, Ztile)))[category ? 0 : 1], tileX, tileZ) / 111) - (category ? 0 : 1);
     }
 
 
-    private static double bilinearInterpolate(double[][] tile, double x, double z) {
+    private static double bilinearInterpolate(short[][] tile, double x, double z) {
         int x1 = (int)x;
         int z1 = (int)z;
         int x2 = Math.min(x1 + 1, tile.length - 1);
